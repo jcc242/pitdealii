@@ -1,13 +1,41 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 # Set the name of the project and target:
 SET(TARGET "pitdealii")
 
-SET(TARGET_SRC
-  ${TARGET}.cc
-  )
+PROJECT(${TARGET})
 
+set(PROJECT_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
+set(INCLUDE_PATH "${PROJECT_PATH}/src")
+set(SRC_PATH "${PROJECT_PATH}/src")
+set(TEST_SRC_PATH "${PROJECT_PATH}/test")
+
+set(LIB_PATH  "${PROJECT_BINARY_DIR}/lib")
+set(LIB_NAME  "${PROJECT_NAME}")
+set(BIN_PATH  "${PROJECT_BINARY_DIR}/bin")
+set(MAIN_NAME "${PROJECT_NAME}_main")
+set(TEST_PATH "${PROJECT_BINARY_DIR}/test")
+set(TEST_NAME "test_${PROJECT_NAME}")
+
+SET(MAIN_SRC ${SRC_PATH}/${TARGET}.cc)
+
+SET(SRC
+  ${SRC_PATH}/BraidFuncs.cc
+  )
+  
+SET(TEST_SRC 
+  ${TEST_SRC_PATH}/test_braid.cc
+  )
+  
+include_directories(AFTER ${INCLUDE_PATH})
+
+message("Dumping paths")
+message(${SRC})
+message("Start test")
+message(${TEST_SRC})
+message("End dump")
 # Usually, you will not need to modify anything beyond this point...
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+
 
 FIND_PACKAGE(deal.II 9.0.0 QUIET
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} $ENV{HOME}/Sources/builddealii ../../../builddealii ../ ../../ $ENV{DEAL_II_DIR}
@@ -20,15 +48,36 @@ IF(NOT ${deal.II_FOUND})
     )
 ENDIF()
 
-set(BRAID_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../braid")
-
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
-PROJECT(${TARGET})
-# DEAL_II_INVOKE_AUTOPILOT()
-add_executable(${TARGET} ${TARGET_SRC})
 
-DEAL_II_SETUP_TARGET(${TARGET})
-
+# Find braid details
+set(BRAID_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../braid")
 # Include the braid paths and libraries
 include_directories(${BRAID_DIR}/)
-target_link_libraries(${TARGET} ${BRAID_DIR}/libbraid.a)
+
+
+##############################
+# Finally start building stuff
+
+# First, build the "library" that consists of all the source files
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LIB_PATH})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LIB_PATH})
+add_library(${LIB_NAME} ${SRC})
+
+
+# Next build the main function
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_PATH})
+add_executable(${MAIN_NAME} ${MAIN_SRC})
+target_link_libraries(${MAIN_NAME} ${LIB_NAME}) # link my library
+target_link_libraries(${MAIN_NAME} ${BRAID_DIR}/libbraid.a) # link braid
+DEAL_II_SETUP_TARGET(${MAIN_NAME}) # Link dealii
+
+# Lastly build the tests
+#enable_testing()
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TEST_PATH})
+add_executable(${TEST_NAME} ${TEST_SRC})
+target_link_libraries(${TEST_NAME} ${LIB_NAME})
+target_link_libraries(${TEST_NAME} ${BRAID_DIR}/libbraid.a) # link braid
+DEAL_II_SETUP_TARGET(${TEST_NAME}) # Link dealii
+#add_test(NAME ${TEST_NAME} COMMAND "${TEST_PATH}/${TEST_NAME}")
+

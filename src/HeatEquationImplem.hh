@@ -139,11 +139,8 @@ void HeatEquation<dim>::define()
 
   setup_system();
 
-  unsigned int pre_refinement_step = 0;
-
   tmp.reinit (solution.size());
   forcing_terms.reinit (solution.size());
-
 
   VectorTools::interpolate(dof_handler,
                            Functions::ZeroFunction<dim>(),
@@ -159,7 +156,6 @@ void HeatEquation<dim>::define()
 template<int dim>
 void HeatEquation<dim>::step(double deltaT)
 {
-
    time += deltaT;
    ++timestep_number;
 

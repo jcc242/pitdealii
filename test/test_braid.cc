@@ -35,6 +35,16 @@ int main(int argc, char** argv)
                                            my_Free,
                                            my_Clone);
 
+  braid_Int sum_result = braid_TestSum(app,
+                                       comm,
+                                       stdout,
+                                       time,
+                                       my_Init,
+                                       my_Access,
+                                       my_Free,
+                                       my_Clone,
+                                       my_Sum);
+
   braid_Int norm_result = braid_TestSpatialNorm(app,
                                                 comm,
                                                 stdout,

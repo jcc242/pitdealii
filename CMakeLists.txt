@@ -25,7 +25,7 @@ SET(SRC
   ${SRC_PATH}/BraidFuncs.cc
   )
   
-SET(TEST_SRC 
+SET(TESnoctilux-theme spacegrey-theme glacier-theme theme-changer sunshine osx-location hyde reveal-in-osx-finder pbcopy osx-trash launchctl seti-theme xterm-color shell-pop multi-term eshell-prompt-extras esh-help powerline hydra spinner parent-mode projectile pkg-info epl flx smartparens iedit anzu highlight packed dash s helm avy helm-core async popup package-build bindT_SRC 
   ${TEST_SRC_PATH}/test_braid.cc
   )
   
@@ -68,11 +68,13 @@ target_link_libraries(${MAIN_NAME} ${BRAID_DIR}/libbraid.a) # link braid
 DEAL_II_SETUP_TARGET(${MAIN_NAME}) # Link dealii
 
 # Lastly build the tests
-#enable_testing()
+enable_testing()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TEST_PATH})
-add_executable(${TEST_NAME} ${TEST_SRC})
-target_link_libraries(${TEST_NAME} ${LIB_NAME})
-target_link_libraries(${TEST_NAME} ${BRAID_DIR}/libbraid.a) # link braid
-DEAL_II_SETUP_TARGET(${TEST_NAME}) # Link dealii
+add_subdirectory(test)
+# add_executable(${TEST_NAME} ${TEST_SRC})
+# target_link_libraries(${TEST_NAME} ${LIB_NAME})
+# target_link_libraries(${TEST_NAME} ${BRAID_DIR}/libbraid.a) # link braid
+# DEAL_II_SETUP_TARGET(${TEST_NAME}) # Link dealii
 #add_test(NAME ${TEST_NAME} COMMAND "${TEST_PATH}/${TEST_NAME}")
+
 

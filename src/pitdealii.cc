@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
       double tstop = 0.5;
       double ntime = 500;
       my_App *app = new(my_App);
-      
+
       app->eq.define();
 
       // HeatEquation<2> heat_equation_solver;

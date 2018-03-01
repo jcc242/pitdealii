@@ -1,4 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+
+set (CMAKE_CXX_STANDARD 11)
+
 # Set the name of the project and target:
 SET(TARGET "pitdealii")
 
@@ -27,14 +30,6 @@ SET(TEST_SRC
   )
   
 include_directories(AFTER ${INCLUDE_PATH})
-
-message("Dumping paths")
-message(${SRC})
-message("Start test")
-message(${TEST_SRC})
-message("End dump")
-# Usually, you will not need to modify anything beyond this point...
-
 
 
 FIND_PACKAGE(deal.II 9.0.0 QUIET

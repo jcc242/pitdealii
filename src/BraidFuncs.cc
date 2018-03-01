@@ -7,20 +7,20 @@ int my_Step(braid_App        app,
             braid_Vector     u,
             braid_StepStatus status)
 {
-   double tstart;             /* current time */
-   double tstop;              /* evolve to this time*/
-   int level, i;
-   double deltaT;
+  double tstart;             /* current time */
+  double tstop;              /* evolve to this time*/
+  int level, i;
+  double deltaT;
    
-   braid_StepStatusGetLevel(status, &level);
-   braid_StepStatusGetTstartTstop(status, &tstart, &tstop);
-   deltaT = tstop - tstart;
+  braid_StepStatusGetLevel(status, &level);
+  braid_StepStatusGetTstartTstop(status, &tstart, &tstop);
+  deltaT = tstop - tstart;
 
-   HeatEquation<2>& heateq = app->eq;
+  HeatEquation<2>& heateq = app->eq;
 
-   heateq.step(deltaT);
+  heateq.step(deltaT);
 
-   return 0;
+  return 0;
 }
 
 int
@@ -28,7 +28,15 @@ my_Init(braid_App     app,
         double        t,
         braid_Vector *u_ptr)
 {
-  my_Vector *u;
+  my_Vector *u = new(my_Vector);
+  int size = app->eq.size();
+  u->data.reinit(size);
+
+  double halfsize = u->data.size()/2.;
+  for (int i = 0; i != u->data.size(); ++i)
+    {
+      u->data[i] = (i-halfsize)*(i-halfsize)*t;
+    }
 
   *u_ptr = u;
 
@@ -40,7 +48,7 @@ my_Clone(braid_App     app,
          braid_Vector  u,
          braid_Vector *v_ptr)
 {
-  my_Vector *v;
+  my_Vector *v = new(my_Vector);
   v->data = u->data;
   *v_ptr = v;
 
@@ -75,8 +83,8 @@ my_SpatialNorm(braid_App     app,
   int    i;
   double dot = 0.0;
   dot = u->data.l2_norm();
-  *norm_ptr = sqrt(dot);
-
+  // *norm_ptr = sqrt(dot);
+  *norm_ptr = dot;
   return 0;
 }
 
@@ -85,8 +93,30 @@ my_Access(braid_App          app,
           braid_Vector       u,
           braid_AccessStatus astatus)
 {
+  int        index, rank, level, done;
+  double     t, error;
 
-   return 0;
+  std::cout << "Access hit here: " << std::endl;
+  braid_AccessStatusGetT(astatus, &t);
+  braid_AccessStatusGetTIndex(astatus, &index);
+  braid_AccessStatusGetLevel(astatus, &level);
+  braid_AccessStatusGetDone(astatus, &done);
+
+  std::cout << "Result: " << std::endl
+            << "\ttime: " << t << "\n"
+            << "\tindex: " << index << "\n"
+            << "\tlevel: " << level << "\n"
+            << "\tdone?: " << done << "\n"
+            << "NumElements: " << u->data.size() << std::endl;
+
+  std::cout << "Vec: ";
+  for(int i = 0; i != u->data.size(); ++i)
+    {
+      std::cout << " " << u->data[i];
+    }
+  std::cout << std::endl;
+
+  return 0;
 }
 
 int
@@ -94,6 +124,8 @@ my_BufSize(braid_App           app,
            int                 *size_ptr,
            braid_BufferStatus  bstatus)
 {
+  int size = app->eq.size();
+  *size_ptr = (size+1)*sizeof(double);
   return 0;
 }
 
@@ -103,6 +135,14 @@ my_BufPack(braid_App           app,
            void               *buffer,
            braid_BufferStatus  bstatus)
 {
+  double *dbuffer = (double*)buffer;
+  int size = u->data.size();
+  dbuffer[0] = size;
+  for(int i=0; i != size; ++i)
+    {
+      dbuffer[i+1] = (u->data)[i];
+    }
+  braid_BufferStatusSetSize(bstatus, (size+1)*sizeof(double));
   return 0;
 }
 
@@ -112,6 +152,16 @@ my_BufUnpack(braid_App           app,
              braid_Vector       *u_ptr,
              braid_BufferStatus  bstatus)
 {
- 
+  my_Vector *u = NULL;
+  double *dbuffer = (double*)buffer;
+  int size = dbuffer[0];
+  u = new(my_Vector);
+  u->data.reinit(size);
+
+  for(int i = 0; i != size; ++i)
+    {
+      (u->data)[i] = dbuffer[i+1];
+    }
+  *u_ptr = u;
   return 0;
 }

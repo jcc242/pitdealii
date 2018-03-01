@@ -129,52 +129,10 @@ void HeatEquation<dim>::output_results() const
   data_out.write_vtk(output);
 }
 
-
-template <int dim>
-void HeatEquation<dim>::refine_mesh (const unsigned int min_grid_level,
-                                     const unsigned int max_grid_level)
-{
-  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
-
-  KellyErrorEstimator<dim>::estimate (dof_handler,
-                                      QGauss<dim-1>(fe.degree+1),
-                                      typename FunctionMap<dim>::type(),
-                                      solution,
-                                      estimated_error_per_cell);
-
-  GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
-                                                     estimated_error_per_cell,
-                                                     0.6, 0.4);
-
-  if (triangulation.n_levels() > max_grid_level)
-    for (typename Triangulation<dim>::active_cell_iterator
-           cell = triangulation.begin_active(max_grid_level);
-         cell != triangulation.end(); ++cell)
-      cell->clear_refine_flag ();
-  for (typename Triangulation<dim>::active_cell_iterator
-         cell = triangulation.begin_active(min_grid_level);
-       cell != triangulation.end_active(min_grid_level); ++cell)
-    cell->clear_coarsen_flag ();
-
-  SolutionTransfer<dim> solution_trans(dof_handler);
-
-  Vector<double> previous_solution;
-  previous_solution = solution;
-  triangulation.prepare_coarsening_and_refinement();
-  solution_trans.prepare_for_coarsening_and_refinement(previous_solution);
-
-  triangulation.execute_coarsening_and_refinement ();
-  setup_system ();
-
-  solution_trans.interpolate(previous_solution, solution);
-  constraints.distribute (solution);
-}
-
 template <int dim>
 void HeatEquation<dim>::define()
 {
-  const unsigned int initial_global_refinement = 2;
-  const unsigned int n_adaptive_pre_refinement_steps = 4;
+  const unsigned int initial_global_refinement = 1;
 
   GridGenerator::hyper_L (triangulation);
   triangulation.refine_global (initial_global_refinement);
@@ -182,9 +140,6 @@ void HeatEquation<dim>::define()
   setup_system();
 
   unsigned int pre_refinement_step = 0;
-
-  Vector<double> tmp;
-  Vector<double> forcing_terms;
 
   tmp.reinit (solution.size());
   forcing_terms.reinit (solution.size());
@@ -262,3 +217,11 @@ void HeatEquation<dim>::step(double deltaT)
 
    old_solution = solution;
 }
+
+template<int dim>
+int HeatEquation<dim>::size() const
+{
+  return solution.size();
+}
+
+

@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
       double tstart = 0.0;
       double tstop = 0.5;
       double ntime = 500;
-      my_App *app;
+      my_App *app = new(my_App);
       
       app->eq.define();
 

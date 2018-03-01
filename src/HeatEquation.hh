@@ -35,68 +35,68 @@ template <int dim>
 class HeatEquation
 {
 public:
-    HeatEquation();
-    void define();
-    void step(double deltaT);
+  HeatEquation();
+  void define();
+  void step(double deltaT);
+
+  int size() const; /// Returns the size of the solution vector
 
 private:
-    void setup_system();
-    void solve_time_step();
-    void output_results() const;
-    void refine_mesh (const unsigned int min_grid_level,
-                      const unsigned int max_grid_level);
+  void setup_system();
+  void solve_time_step();
+  void output_results() const;
 
-    Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
+  Triangulation<dim>   triangulation;
+  FE_Q<dim>            fe;
+  DoFHandler<dim>      dof_handler;
 
-    ConstraintMatrix     constraints;
+  ConstraintMatrix     constraints;
 
-    SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> mass_matrix;
-    SparseMatrix<double> laplace_matrix;
-    SparseMatrix<double> system_matrix;
+  SparsityPattern      sparsity_pattern;
+  SparseMatrix<double> mass_matrix;
+  SparseMatrix<double> laplace_matrix;
+  SparseMatrix<double> system_matrix;
 
-    Vector<double>       solution;
-    Vector<double>       old_solution;
-    Vector<double>       system_rhs;
+  Vector<double>       solution;
+  Vector<double>       old_solution;
+  Vector<double>       system_rhs;
 
-    double               time;
-    double               time_step;
-    unsigned int         timestep_number;
+  double               time;
+  double               time_step;
+  unsigned int         timestep_number;
 
-    const double         theta;
+  const double         theta;
 
-    // These were originally in the run() function but because
-    // I am splitting the run() function up into define and step
-    // they need to become member data
-    Vector<double> tmp;
-    Vector<double> forcing_terms;
+  // These were originally in the run() function but because
+  // I am splitting the run() function up into define and step
+  // they need to become member data
+  Vector<double> tmp;
+  Vector<double> forcing_terms;
 };
 
 template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-    RightHandSide ()
-        :
-        Function<dim>(),
-        period (0.2)
-    {}
+  RightHandSide ()
+    :
+    Function<dim>(),
+    period (0.2)
+  {}
 
-    virtual double value (const Point<dim> &p,
-                          const unsigned int component = 0) const;
+  virtual double value (const Point<dim> &p,
+                        const unsigned int component = 0) const;
 
 private:
-    const double period;
+  const double period;
 };
 
 template <int dim>
 class BoundaryValues : public Function<dim>
 {
 public:
-    virtual double value (const Point<dim>  &p,
-                          const unsigned int component = 0) const;
+  virtual double value (const Point<dim>  &p,
+                        const unsigned int component = 0) const;
 };
 
 #include "HeatEquationImplem.hh"

@@ -24,7 +24,6 @@ typedef struct _braid_App_struct
   HeatEquation<2> eq;
 } my_App;
 
-
 int my_Step(braid_App        app,
             braid_Vector     ustop,
             braid_Vector     fstop,
@@ -45,7 +44,7 @@ int
 my_Free(braid_App    app,
         braid_Vector u);
 
-int 
+int
 my_Sum(braid_App app,
        double alpha,
        braid_Vector x,

@@ -41,8 +41,9 @@ int main(int argc, char *argv[])
       braid_Core core;
       double tstart = 0.0;
       double tstop = 0.5;
-      double ntime = 500;
+      double ntime = 250;
       my_App *app = new(my_App);
+
 
       app->eq.define();
 
@@ -52,9 +53,9 @@ int main(int argc, char *argv[])
                  my_Step, my_Init, my_Clone, my_Free, my_Sum, my_SpatialNorm,
                  my_Access, my_BufSize, my_BufPack, my_BufUnpack, &core);
 
-      /* Define XBraid parameters 
-       * See -help message for descriptions */
-      int       max_levels    = 2;
+      /* Define XBraid parameters
+       * See -help message forf descriptions */
+      int       max_levels    = 1;
       int       nrelax        = 1;
       int       skip          = 0;
       double    tol           = 1.0e-07;
@@ -65,20 +66,20 @@ int main(int argc, char *argv[])
       int       scoarsen      = 0;
       int       res           = 0;
       int       wrapper_tests = 0;
-      int       print_level   = 1;
+      int       print_level   = 2;
       int       access_level  = 1;
       int       use_sequential= 0;
 
       braid_SetPrintLevel( core, print_level);
       braid_SetAccessLevel( core, access_level);
       braid_SetMaxLevels(core, max_levels);
-      braid_SetMinCoarse( core, min_coarse );
-      braid_SetSkip(core, skip);
-      braid_SetNRelax(core, -1, nrelax);
-      braid_SetAbsTol(core, tol);
-      braid_SetCFactor(core, -1, cfactor);
-      braid_SetMaxIter(core, max_iter);
-      braid_SetSeqSoln(core, use_sequential);
+//       braid_SetMinCoarse( core, min_coarse );
+//       braid_SetSkip(core, skip);
+//       braid_SetNRelax(core, -1, nrelax);
+//       braid_SetAbsTol(core, tol);
+//       braid_SetCFactor(core, -1, cfactor);
+//       braid_SetMaxIter(core, max_iter);
+//      braid_SetSeqSoln(core, use_sequential);
 
       braid_Drive(core);
 

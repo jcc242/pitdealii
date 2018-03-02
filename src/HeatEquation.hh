@@ -37,9 +37,13 @@ class HeatEquation
 public:
   HeatEquation();
   void define();
-  void step(double deltaT);
+  void step(Vector<double>& braid_data,
+            double deltaT);
 
   int size() const; /// Returns the size of the solution vector
+  double dt() const;
+
+  void dump_vec(const Vector<double>& vector) const;
 
 private:
   void setup_system();

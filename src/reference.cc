@@ -62,6 +62,8 @@ namespace Reference
     HeatEquation();
     void run();
 
+    void dump_vec(const Vector<double>& vector) const;
+
   private:
     void setup_system();
     void solve_time_step();
@@ -299,12 +301,21 @@ namespace Reference
     constraints.distribute (solution);
   }
 
-
+  template<int dim> void
+  HeatEquation<dim>::dump_vec(const Vector<double>& vector) const
+  {
+    std::cout << "Dumping vec:";
+    for(int i=0; i != vector.size(); ++i)
+      {
+        std::cout << " " << vector[i];
+      }
+    std::cout << std::endl;
+  }
 
   template <int dim>
   void HeatEquation<dim>::run()
   {
-    const unsigned int initial_global_refinement = 2;
+    const unsigned int initial_global_refinement = 1;
 
     GridGenerator::hyper_L (triangulation);
     triangulation.refine_global (initial_global_refinement);
@@ -346,6 +357,7 @@ namespace Reference
                                             QGauss<dim>(fe.degree+1),
                                             rhs_function,
                                             tmp);
+
         forcing_terms = tmp;
         forcing_terms *= time_step * theta;
 

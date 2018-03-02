@@ -52,6 +52,12 @@ my_Sum(braid_App app,
        braid_Vector y);
 
 int
+my_TimeGrid(braid_App   app,
+            braid_Real *ta,
+            braid_Int  *ilower,
+            braid_Int  *iupper);
+
+int
 my_SpatialNorm(braid_App     app,
                braid_Vector  u,
                double       *norm_ptr);

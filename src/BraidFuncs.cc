@@ -9,16 +9,19 @@ int my_Step(braid_App        app,
 {
   double tstart;             /* current time */
   double tstop;              /* evolve to this time*/
-  int level, i;
+  int level;
   double deltaT;
-   
+
   braid_StepStatusGetLevel(status, &level);
   braid_StepStatusGetTstartTstop(status, &tstart, &tstop);
+
   deltaT = tstop - tstart;
+
+  dealii::Vector<double>& solution = u->data;
 
   HeatEquation<2>& heateq = app->eq;
 
-  heateq.step(deltaT);
+  heateq.step(solution, deltaT);
 
   return 0;
 }
@@ -32,10 +35,13 @@ my_Init(braid_App     app,
   int size = app->eq.size();
   u->data.reinit(size);
 
-  double halfsize = u->data.size()/2.;
-  for (int i = 0; i != u->data.size(); ++i)
+  if(t < 0)
     {
-      u->data[i] = (i-halfsize)*(i-halfsize)*t;
+      double halfsize = u->data.size()/2.;
+      for (int i = 0; i != u->data.size(); ++i)
+        {
+          u->data[i] = (i-halfsize)*(i-halfsize)*t;
+        }
     }
 
   *u_ptr = u;
@@ -76,14 +82,36 @@ int my_Sum(braid_App app,
 }
 
 int
+my_TimeGrid(braid_App   app,
+            braid_Real *ta,
+            braid_Int  *ilower,
+            braid_Int  *iupper)
+{
+  double dt = app->eq.dt();
+  int lower, upper;
+  lower = *ilower;
+  upper = *iupper;
+
+  for (int i = lower; i != upper; ++i)
+    {
+      ta[i-lower] = dt;
+    }
+    
+  std::cout << "lower: " << lower << " upper: " << upper << std::endl;
+  for (int i=0; i != upper; ++i)
+  {
+    std::cout << "ta: " << ta[i] << std::endl;
+  }
+  return 0;
+}
+
+int
 my_SpatialNorm(braid_App     app,
                braid_Vector  u,
                double       *norm_ptr)
 {
-  int    i;
   double dot = 0.0;
   dot = u->data.l2_norm();
-  // *norm_ptr = sqrt(dot);
   *norm_ptr = dot;
   return 0;
 }
@@ -93,28 +121,28 @@ my_Access(braid_App          app,
           braid_Vector       u,
           braid_AccessStatus astatus)
 {
-  int        index, rank, level, done;
-  double     t, error;
+  // int        index, rank, level, done;
+  // double     t, error;
 
-  std::cout << "Access hit here: " << std::endl;
-  braid_AccessStatusGetT(astatus, &t);
-  braid_AccessStatusGetTIndex(astatus, &index);
-  braid_AccessStatusGetLevel(astatus, &level);
-  braid_AccessStatusGetDone(astatus, &done);
+  // std::cout << "Access hit here: " << std::endl;
+  // braid_AccessStatusGetT(astatus, &t);
+  // braid_AccessStatusGetTIndex(astatus, &index);
+  // braid_AccessStatusGetLevel(astatus, &level);
+  // braid_AccessStatusGetDone(astatus, &done);
 
-  std::cout << "Result: " << std::endl
-            << "\ttime: " << t << "\n"
-            << "\tindex: " << index << "\n"
-            << "\tlevel: " << level << "\n"
-            << "\tdone?: " << done << "\n"
-            << "NumElements: " << u->data.size() << std::endl;
+  // std::cout << "Result: " << std::endl
+  //           << "\ttime: " << t << "\n"
+  //           << "\tindex: " << index << "\n"
+  //           << "\tlevel: " << level << "\n"
+  //           << "\tdone?: " << done << "\n"
+  //           << "NumElements: " << u->data.size() << std::endl;
 
-  std::cout << "Vec: ";
-  for(int i = 0; i != u->data.size(); ++i)
-    {
-      std::cout << " " << u->data[i];
-    }
-  std::cout << std::endl;
+  // std::cout << "Vec: ";
+  // for(int i = 0; i != u->data.size(); ++i)
+  //   {
+  //     std::cout << " " << u->data[i];
+  //   }
+  // std::cout << std::endl;
 
   return 0;
 }

@@ -5,6 +5,9 @@ set (CMAKE_CXX_STANDARD 11)
 # Set the name of the project and target:
 SET(TARGET "pitdealii")
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
+
+
 PROJECT(${TARGET})
 
 set(PROJECT_PATH "${CMAKE_CURRENT_SOURCE_DIR}")

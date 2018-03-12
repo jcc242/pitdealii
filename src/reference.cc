@@ -339,8 +339,6 @@ namespace Reference
 
     setup_system();
 
-    unsigned int pre_refinement_step = 0;
-
     Vector<double> tmp;
     Vector<double> forcing_terms;
 
@@ -354,9 +352,6 @@ namespace Reference
     solution = old_solution;
 
     output_results();
-    std::ofstream myfile;
-    myfile.open("refoutput.dat", std::ios::out | std::ios::trunc);
-    unsigned debug_step = 21;
 
     while (time <= 0.5)
       {

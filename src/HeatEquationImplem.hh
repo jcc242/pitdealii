@@ -58,7 +58,6 @@ HeatEquation<dim>::HeatEquation ()
   timestep_number (0),
   theta(0.5)
 {
-  myfile.open("soloutput.dat", std::ios::out | std::ios::trunc);
 }
 
 template <int dim>

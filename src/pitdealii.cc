@@ -59,19 +59,19 @@ int main(int argc, char *argv[])
       /* Define XBraid parameters
        * See -help message forf descriptions */
       int       max_levels    = 1;
-      int       nrelax        = 1;
-      int       skip          = 0;
-      double    tol           = 1.0e-07;
-      int       cfactor       = 2;
-      int       max_iter      = 30;
-      int       min_coarse    = 3;
-      int       fmg           = 0;
-      int       scoarsen      = 0;
-      int       res           = 0;
-      int       wrapper_tests = 0;
+      // int       nrelax        = 1;
+      // int       skip          = 0;
+      // double    tol           = 1.0e-07;
+      // int       cfactor       = 2;
+      // int       max_iter      = 30;
+      // int       min_coarse    = 3;
+      // int       fmg           = 0;
+      // int       scoarsen      = 0;
+      // int       res           = 0;
+      // int       wrapper_tests = 0;
       int       print_level   = 2;
       int       access_level  = 1;
-      int       use_sequential= 0;
+      // int       use_sequential= 0;
 
       braid_SetPrintLevel( core, print_level);
       braid_SetAccessLevel( core, access_level);
@@ -87,7 +87,6 @@ int main(int argc, char *argv[])
       braid_Drive(core);
 
       braid_Destroy(core);
-      // heat_equation_solver.run(tstart, tstop, ntime);
 
       // Clean up MPI
       MPI_Comm_free(&comm_t);

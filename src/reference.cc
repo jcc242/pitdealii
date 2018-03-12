@@ -129,29 +129,29 @@ namespace Reference
     if ((point_within_period >= 0.0) && (point_within_period < 0.2))
       {
         if ((p[0] > 0.5) && (p[1] > -0.5))
-        {
-          return 1;
-        }
+          {
+            return 1;
+          }
         else
-        {
-          return 0;
-        }
+          {
+            return 0;
+          }
       }
     else if ((point_within_period >= 0.5) && (point_within_period <= 0.7))
       {
         if ((p[0] > -0.5) && (p[1] > 0.5))
-        {
-          return 1;
-        }
+          {
+            return 1;
+          }
         else
-        {
-          return 0;
-        }
+          {
+            return 0;
+          }
       }
     else
-    {
-      return 0;
-    }
+      {
+        return 0;
+      }
   }
 
 
@@ -264,8 +264,8 @@ namespace Reference
     data_out.build_patches();
 
     const std::string filename = "reference-"
-                                 + Utilities::int_to_string(timestep_number, 3) +
-                                 ".vtk";
+      + Utilities::int_to_string(timestep_number, 3) +
+      ".vtk";
     std::ofstream output(filename.c_str());
     data_out.write_vtk(output);
 
@@ -295,11 +295,11 @@ namespace Reference
 
     if (triangulation.n_levels() > max_grid_level)
       for (typename Triangulation<dim>::active_cell_iterator
-           cell = triangulation.begin_active(max_grid_level);
+             cell = triangulation.begin_active(max_grid_level);
            cell != triangulation.end(); ++cell)
         cell->clear_refine_flag ();
     for (typename Triangulation<dim>::active_cell_iterator
-         cell = triangulation.begin_active(min_grid_level);
+           cell = triangulation.begin_active(min_grid_level);
          cell != triangulation.end_active(min_grid_level); ++cell)
       cell->clear_coarsen_flag ();
 

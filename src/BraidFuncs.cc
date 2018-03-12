@@ -99,9 +99,9 @@ my_TimeGrid(braid_App   app,
     
   std::cout << "lower: " << lower << " upper: " << upper << std::endl;
   for (int i=0; i != upper; ++i)
-  {
-    std::cout << "ta: " << ta[i] << std::endl;
-  }
+    {
+      std::cout << "ta: " << ta[i] << std::endl;
+    }
   return 0;
 }
 

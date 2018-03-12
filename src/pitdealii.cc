@@ -76,13 +76,13 @@ int main(int argc, char *argv[])
       braid_SetPrintLevel( core, print_level);
       braid_SetAccessLevel( core, access_level);
       braid_SetMaxLevels(core, max_levels);
-//       braid_SetMinCoarse( core, min_coarse );
-//       braid_SetSkip(core, skip);
-//       braid_SetNRelax(core, -1, nrelax);
-//       braid_SetAbsTol(core, tol);
-//       braid_SetCFactor(core, -1, cfactor);
-//       braid_SetMaxIter(core, max_iter);
-//      braid_SetSeqSoln(core, use_sequential);
+      //       braid_SetMinCoarse( core, min_coarse );
+      //       braid_SetSkip(core, skip);
+      //       braid_SetNRelax(core, -1, nrelax);
+      //       braid_SetAbsTol(core, tol);
+      //       braid_SetCFactor(core, -1, cfactor);
+      //       braid_SetMaxIter(core, max_iter);
+      //      braid_SetSeqSoln(core, use_sequential);
 
       braid_Drive(core);
 

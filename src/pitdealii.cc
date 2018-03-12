@@ -45,11 +45,14 @@ int main(int argc, char *argv[])
       my_App *app = new(my_App);
 
 
+      // Set up the time and space MPI comms
+      braid_SplitCommworld(&comm, 1, &comm_x, &comm_t);
+
       app->eq.define();
 
       // HeatEquation<2> heat_equation_solver;
 
-      braid_Init(MPI_COMM_WORLD, comm, tstart, tstop, ntime, app,
+      braid_Init(comm, comm_t, tstart, tstop, ntime, app,
                  my_Step, my_Init, my_Clone, my_Free, my_Sum, my_SpatialNorm,
                  my_Access, my_BufSize, my_BufPack, my_BufUnpack, &core);
 
@@ -86,6 +89,9 @@ int main(int argc, char *argv[])
       braid_Destroy(core);
       // heat_equation_solver.run(tstart, tstop, ntime);
 
+      // Clean up MPI
+      MPI_Comm_free(&comm_t);
+      MPI_Finalize();
     }
   catch (std::exception &exc)
     {

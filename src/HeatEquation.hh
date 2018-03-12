@@ -1,6 +1,8 @@
 #ifndef _HEATEQUATION_H_
 #define _HEATEQUATION_H_
 
+#include <fstream>
+
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
@@ -43,7 +45,8 @@ public:
   int size() const; /// Returns the size of the solution vector
   double dt() const;
 
-  void dump_vec(const Vector<double>& vector) const;
+  void dump_vec(std::ofstream& file,
+                const Vector<double>& vector) const;
 
 private:
   void setup_system();
@@ -68,6 +71,8 @@ private:
   double               time;
   double               time_step;
   unsigned int         timestep_number;
+
+  std::ofstream myfile;
 
   const double         theta;
 

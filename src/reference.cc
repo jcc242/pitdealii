@@ -49,7 +49,6 @@
 #include <fstream>
 #include <iostream>
 
-
 namespace Reference
 {
   using namespace dealii;
@@ -62,7 +61,8 @@ namespace Reference
     HeatEquation();
     void run();
 
-    void dump_vec(const Vector<double>& vector) const;
+    void dump_vec(std::ofstream& file,
+                  const Vector<double>& vector) const;
 
   private:
     void setup_system();
@@ -126,22 +126,32 @@ namespace Reference
     const double time = this->get_time();
     const double point_within_period = (time/period - std::floor(time/period));
 
-    if ((point_within_period >= 0.0) && (point_within_period <= 0.2))
+    if ((point_within_period >= 0.0) && (point_within_period < 0.2))
       {
         if ((p[0] > 0.5) && (p[1] > -0.5))
+        {
           return 1;
+        }
         else
+        {
           return 0;
+        }
       }
     else if ((point_within_period >= 0.5) && (point_within_period <= 0.7))
       {
         if ((p[0] > -0.5) && (p[1] > 0.5))
+        {
           return 1;
+        }
         else
+        {
           return 0;
+        }
       }
     else
+    {
       return 0;
+    }
   }
 
 
@@ -258,6 +268,12 @@ namespace Reference
                                  ".vtk";
     std::ofstream output(filename.c_str());
     data_out.write_vtk(output);
+
+    const std::string filename2 = "reference-"
+      + Utilities::int_to_string(timestep_number, 3) +
+      ".gpl";
+    std::ofstream output2(filename2.c_str());
+    data_out.write_gnuplot(output2);
   }
 
 
@@ -302,14 +318,15 @@ namespace Reference
   }
 
   template<int dim> void
-  HeatEquation<dim>::dump_vec(const Vector<double>& vector) const
+  HeatEquation<dim>::dump_vec(std::ofstream& file,
+                              const Vector<double>& vector) const
   {
-    std::cout << "Dumping vec:";
+    file << "Dumping vec:";
     for(int i=0; i != vector.size(); ++i)
       {
-        std::cout << " " << vector[i];
+        file << "\n" << vector[i];
       }
-    std::cout << std::endl;
+    file << std::endl;
   }
 
   template <int dim>
@@ -317,7 +334,7 @@ namespace Reference
   {
     const unsigned int initial_global_refinement = 1;
 
-    GridGenerator::hyper_L (triangulation);
+    GridGenerator::hyper_cube (triangulation);
     triangulation.refine_global (initial_global_refinement);
 
     setup_system();
@@ -337,6 +354,9 @@ namespace Reference
     solution = old_solution;
 
     output_results();
+    std::ofstream myfile;
+    myfile.open("refoutput.dat", std::ios::out | std::ios::trunc);
+    unsigned debug_step = 21;
 
     while (time <= 0.5)
       {
@@ -344,11 +364,12 @@ namespace Reference
         ++timestep_number;
 
         std::cout << "Time step " << timestep_number << " at t=" << time
-                  << std::endl;
+                  << " dt=" << time_step << std::endl;
 
         mass_matrix.vmult(system_rhs, old_solution);
 
         laplace_matrix.vmult(tmp, old_solution);
+
         system_rhs.add(-(1 - theta) * time_step, tmp);
 
         RightHandSide<dim> rhs_function;
@@ -368,7 +389,6 @@ namespace Reference
                                             tmp);
 
         forcing_terms.add(time_step * (1 - theta), tmp);
-
         system_rhs += forcing_terms;
 
         system_matrix.copy_from(mass_matrix);

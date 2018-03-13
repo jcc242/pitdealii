@@ -22,6 +22,7 @@
 
 #include "BraidFuncs.hh"
 #include "HeatEquation.hh"
+#include "Utilities.hh"
 
 int main(int argc, char *argv[])
 {
@@ -30,11 +31,12 @@ int main(int argc, char *argv[])
       using namespace dealii;
 
       /* Initialize MPI */
-      MPI_Comm      comm, comm_x, comm_t;
+      MPI_Comm      comm; //, comm_x, comm_t;
       int rank;
       MPI_Init(&argc, &argv);
       comm   = MPI_COMM_WORLD;
       MPI_Comm_rank(comm, &rank);
+      procID = rank;
 
       // Set up X-Braid
       /* Initialize Braid */
@@ -46,13 +48,13 @@ int main(int argc, char *argv[])
 
 
       // Set up the time and space MPI comms
-      braid_SplitCommworld(&comm, 1, &comm_x, &comm_t);
+      // braid_SplitCommworld(&comm, 1, &comm_x, &comm_t);
 
       app->eq.define();
 
       // HeatEquation<2> heat_equation_solver;
 
-      braid_Init(comm, comm_t, tstart, tstop, ntime, app,
+      braid_Init(MPI_COMM_WORLD, comm, tstart, tstop, ntime, app,
                  my_Step, my_Init, my_Clone, my_Free, my_Sum, my_SpatialNorm,
                  my_Access, my_BufSize, my_BufPack, my_BufUnpack, &core);
 
@@ -89,7 +91,7 @@ int main(int argc, char *argv[])
       braid_Destroy(core);
 
       // Clean up MPI
-      MPI_Comm_free(&comm_t);
+      // MPI_Comm_free(&comm);
       MPI_Finalize();
     }
   catch (std::exception &exc)

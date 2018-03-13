@@ -1,4 +1,5 @@
 #include <iomanip>
+#include "Utilities.hh"
 
 template <int dim>
 double RightHandSide<dim>::value (const Point<dim> &p,
@@ -112,14 +113,18 @@ void HeatEquation<dim>::output_results() const
 
   data_out.build_patches();
 
+  int plot_number = timestep_number * (procID + 1);
+
+  pout() << "Plotting time: " << time << std::endl;
+
   const std::string filename = "solution-seq-serial-"
-    + Utilities::int_to_string(timestep_number, 3) +
+    + Utilities::int_to_string(plot_number, 3) +
     ".vtk";
   std::ofstream output(filename.c_str());
   data_out.write_vtk(output);
 
   const std::string filename2 = "solution-seq-serial-"
-    + Utilities::int_to_string(timestep_number, 3) +
+    + Utilities::int_to_string(plot_number, 3) +
     ".gpl";
   std::ofstream output2(filename2.c_str());
   data_out.write_gnuplot(output2);
@@ -153,14 +158,14 @@ template<int dim>
 void HeatEquation<dim>::step(Vector<double>& braid_data,
                              double deltaT)
 {
-  unsigned debug_step = 21;
   // Set old solution to the braid data
   old_solution = braid_data;
 
   time += deltaT;
   ++timestep_number;
 
-  std::cout << "Time step " << timestep_number << " at t=" << time
+  int plot_number = timestep_number * (procID + 1);
+  std::cout << "Time step " << plot_number << " at t=" << time
             << " dt=" << deltaT << std::endl;
 
   mass_matrix.vmult(system_rhs, old_solution);

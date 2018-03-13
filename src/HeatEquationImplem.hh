@@ -8,30 +8,9 @@ double RightHandSide<dim>::value (const Point<dim> &p,
   Assert (component == 0, ExcIndexRange(component, 0, 1));
   Assert (dim == 2, ExcNotImplemented());
 
-  const double time = this->get_time();
-  const double point_within_period = (time/period - std::floor(time/period));
-
-  if ((point_within_period >= 0.0) && (point_within_period < 0.2))
+  if ((p[0] > 0.5) && (p[1] > -0.5))
     {
-      if ((p[0] > 0.5) && (p[1] > -0.5))
-        {
-          return 1;
-        }
-      else
-        {
-          return 0;
-        }
-    }
-  else if ((point_within_period >= 0.5) && (point_within_period <= 0.7))
-    {
-      if ((p[0] > -0.5) && (p[1] > 0.5))
-        {
-          return 1;
-        }
-      else
-        {
-          return 0;
-        }
+      return 1;
     }
   else
     {
@@ -94,8 +73,6 @@ void HeatEquation<dim>::setup_system()
                                     QGauss<dim>(fe.degree+1),
                                     mass_matrix);
   MatrixCreator::create_laplace_matrix(dof_handler,
-                               
-
                                        QGauss<dim>(fe.degree+1),
                                        laplace_matrix);
 
@@ -135,13 +112,13 @@ void HeatEquation<dim>::output_results() const
 
   data_out.build_patches();
 
-  const std::string filename = "solution-seq-parallel-"
+  const std::string filename = "solution-seq-serial-"
     + Utilities::int_to_string(timestep_number, 3) +
     ".vtk";
   std::ofstream output(filename.c_str());
   data_out.write_vtk(output);
 
-  const std::string filename2 = "solution-seq-parallel-"
+  const std::string filename2 = "solution-seq-serial-"
     + Utilities::int_to_string(timestep_number, 3) +
     ".gpl";
   std::ofstream output2(filename2.c_str());
@@ -151,9 +128,9 @@ void HeatEquation<dim>::output_results() const
 template <int dim>
 void HeatEquation<dim>::define()
 {
-  const unsigned int initial_global_refinement = 1;
+  const unsigned int initial_global_refinement = 4;
 
-  GridGenerator::hyper_cube (triangulation);
+  GridGenerator::hyper_L (triangulation);
   triangulation.refine_global (initial_global_refinement);
 
   setup_system();

@@ -124,29 +124,10 @@ namespace Reference
     Assert (dim == 2, ExcNotImplemented());
 
     const double time = this->get_time();
-    const double point_within_period = (time/period - std::floor(time/period));
 
-    if ((point_within_period >= 0.0) && (point_within_period < 0.2))
+    if ((p[0] > 0.5) && (p[1] > -0.5))
       {
-        if ((p[0] > 0.5) && (p[1] > -0.5))
-          {
-            return 1;
-          }
-        else
-          {
-            return 0;
-          }
-      }
-    else if ((point_within_period >= 0.5) && (point_within_period <= 0.7))
-      {
-        if ((p[0] > -0.5) && (p[1] > 0.5))
-          {
-            return 1;
-          }
-        else
-          {
-            return 0;
-          }
+        return 1;
       }
     else
       {
@@ -332,9 +313,9 @@ namespace Reference
   template <int dim>
   void HeatEquation<dim>::run()
   {
-    const unsigned int initial_global_refinement = 1;
+    const unsigned int initial_global_refinement = 4;
 
-    GridGenerator::hyper_cube (triangulation);
+    GridGenerator::hyper_L (triangulation);
     triangulation.refine_global (initial_global_refinement);
 
     setup_system();

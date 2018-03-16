@@ -127,7 +127,11 @@ namespace Reference
 
     if ((p[0] > 0.5) && (p[1] > -0.5))
       {
-        return 1;
+        return std::exp(-0.5*(time-0.125)*(time-0.125)/(0.005));
+      }
+    else if ((p[0] > -0.5) && (p[1] > 0.5))
+      {
+        return std::exp(-0.5*(time-0.375)*(time-0.375)/(0.005));
       }
     else
       {
@@ -313,7 +317,7 @@ namespace Reference
   template <int dim>
   void HeatEquation<dim>::run()
   {
-    const unsigned int initial_global_refinement = 4;
+    const unsigned int initial_global_refinement = 1;
 
     GridGenerator::hyper_L (triangulation);
     triangulation.refine_global (initial_global_refinement);

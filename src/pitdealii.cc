@@ -50,7 +50,6 @@ int main(int argc, char *argv[])
       // Set up the time and space MPI comms
       // braid_SplitCommworld(&comm, 1, &comm_x, &comm_t);
 
-      app->eq.define();
 
       // HeatEquation<2> heat_equation_solver;
 
@@ -85,6 +84,7 @@ int main(int argc, char *argv[])
       //       braid_SetCFactor(core, -1, cfactor);
       //       braid_SetMaxIter(core, max_iter);
       //      braid_SetSeqSoln(core, use_sequential);
+      app->eq.define();
 
       braid_Drive(core);
 

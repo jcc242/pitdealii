@@ -40,10 +40,11 @@ public:
   HeatEquation();
   void define();
   void step(Vector<double>& braid_data,
-            double deltaT);
+            double deltaT,
+            double a_time,
+            int a_time_idx);
 
   int size() const; /// Returns the size of the solution vector
-  double dt() const;
 
   void dump_vec(std::ofstream& file,
                 const Vector<double>& vector) const;
@@ -51,7 +52,7 @@ public:
 private:
   void setup_system();
   void solve_time_step();
-  void output_results() const;
+  void output_results(int a_time_idx) const;
 
   Triangulation<dim>   triangulation;
   FE_Q<dim>            fe;
@@ -67,10 +68,6 @@ private:
   Vector<double>       solution;
   Vector<double>       old_solution;
   Vector<double>       system_rhs;
-
-  double               time;
-  double               time_step;
-  unsigned int         timestep_number;
 
   std::ofstream myfile;
 

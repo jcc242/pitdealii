@@ -1,4 +1,5 @@
 #include <iomanip>
+#include <math.h>
 #include "Utilities.hh"
 
 template <int dim>
@@ -9,9 +10,15 @@ double RightHandSide<dim>::value (const Point<dim> &p,
   Assert (component == 0, ExcIndexRange(component, 0, 1));
   Assert (dim == 2, ExcNotImplemented());
 
+  double time = this->get_time();
+
   if ((p[0] > 0.5) && (p[1] > -0.5))
     {
-      return 1;
+      return std::exp(-0.5*(time-0.125)*(time-0.125)/(0.005));
+    }
+  else if ((p[0] > -0.5) && (p[1] > 0.5))
+    {
+      return std::exp(-0.5*(time-0.375)*(time-0.375)/(0.005));
     }
   else
     {
@@ -33,9 +40,6 @@ HeatEquation<dim>::HeatEquation ()
   :
   fe(1),
   dof_handler(triangulation),
-  time (0.0),
-  time_step(1. / 500),
-  timestep_number (0),
   theta(0.5)
 {
 }
@@ -45,14 +49,14 @@ void HeatEquation<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
-  std::cout << std::endl
-            << "==========================================="
-            << std::endl
-            << "Number of active cells: " << triangulation.n_active_cells()
-            << std::endl
-            << "Number of degrees of freedom: " << dof_handler.n_dofs()
-            << std::endl
-            << std::endl;
+  pout() << std::endl
+         << "==========================================="
+         << std::endl
+         << "Number of active cells: " << triangulation.n_active_cells()
+         << std::endl
+         << "Number of degrees of freedom: " << dof_handler.n_dofs()
+         << std::endl
+         << std::endl;
 
   constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
@@ -97,14 +101,14 @@ void HeatEquation<dim>::solve_time_step()
 
   constraints.distribute(solution);
 
-  std::cout << "     " << solver_control.last_step()
-            << " CG iterations." << std::endl;
+  pout() << "     " << solver_control.last_step()
+         << " CG iterations." << std::endl;
 }
 
 
 
 template <int dim>
-void HeatEquation<dim>::output_results() const
+void HeatEquation<dim>::output_results(int a_time_idx) const
 {
   DataOut<dim> data_out;
 
@@ -113,27 +117,24 @@ void HeatEquation<dim>::output_results() const
 
   data_out.build_patches();
 
-  int plot_number = timestep_number * (procID + 1);
-
-  pout() << "Plotting time: " << time << std::endl;
-
-  const std::string filename = "solution-seq-serial-"
-    + Utilities::int_to_string(plot_number, 3) +
+  const std::string filename = "solution-seq-parallel-"
+    + Utilities::int_to_string(a_time_idx, 3) +
     ".vtk";
   std::ofstream output(filename.c_str());
   data_out.write_vtk(output);
 
-  const std::string filename2 = "solution-seq-serial-"
-    + Utilities::int_to_string(plot_number, 3) +
+  const std::string filename2 = "solution-seq-parallel-"
+    + Utilities::int_to_string(a_time_idx, 3) +
     ".gpl";
   std::ofstream output2(filename2.c_str());
   data_out.write_gnuplot(output2);
 }
 
+// This function won't make much sense in real parallel in time...
 template <int dim>
 void HeatEquation<dim>::define()
 {
-  const unsigned int initial_global_refinement = 4;
+  const unsigned int initial_global_refinement = 1;
 
   GridGenerator::hyper_L (triangulation);
   triangulation.refine_global (initial_global_refinement);
@@ -148,60 +149,56 @@ void HeatEquation<dim>::define()
                            old_solution);
   solution = old_solution;
 
-  output_results();
+  int time_step = 0;
 
-  // I think we can safely set the time here
-  time = 0.;
+  output_results(time_step);
 }
 
 template<int dim>
 void HeatEquation<dim>::step(Vector<double>& braid_data,
-                             double deltaT)
+                             double deltaT,
+                             double a_time,
+                             int a_time_idx)
 {
   // Set old solution to the braid data
   old_solution = braid_data;
-
-  time += deltaT;
-  ++timestep_number;
-
-  int plot_number = timestep_number * (procID + 1);
-  std::cout << "Time step " << plot_number << " at t=" << time
-            << " dt=" << deltaT << std::endl;
+  a_time += deltaT;
+  ++a_time_idx;
 
   mass_matrix.vmult(system_rhs, old_solution);
 
   laplace_matrix.vmult(tmp, old_solution);
 
-  system_rhs.add(-(1 - theta) * time_step, tmp);
-  
+  system_rhs.add(-(1 - theta) * deltaT, tmp);
+
   RightHandSide<dim> rhs_function;
-  rhs_function.set_time(time);
+  rhs_function.set_time(a_time);
   VectorTools::create_right_hand_side(dof_handler,
                                       QGauss<dim>(fe.degree+1),
                                       rhs_function,
                                       tmp);
 
   forcing_terms = tmp;
-  forcing_terms *= time_step * theta;
+  forcing_terms *= deltaT * theta;
 
-  rhs_function.set_time(time - time_step);
+  rhs_function.set_time(a_time - deltaT);
   VectorTools::create_right_hand_side(dof_handler,
                                       QGauss<dim>(fe.degree+1),
                                       rhs_function,
                                       tmp);
 
-  forcing_terms.add(time_step * (1 - theta), tmp);
+  forcing_terms.add(deltaT * (1 - theta), tmp);
 
   system_rhs += forcing_terms;
 
   system_matrix.copy_from(mass_matrix);
-  system_matrix.add(theta * time_step, laplace_matrix);
+  system_matrix.add(theta * deltaT, laplace_matrix);
 
   constraints.condense (system_matrix, system_rhs);
 
   {
     BoundaryValues<dim> boundary_values_function;
-    boundary_values_function.set_time(time);
+    boundary_values_function.set_time(a_time);
 
     std::map<types::global_dof_index, double> boundary_values;
     VectorTools::interpolate_boundary_values(dof_handler,
@@ -218,7 +215,7 @@ void HeatEquation<dim>::step(Vector<double>& braid_data,
 
   solve_time_step();
 
-  output_results();
+  output_results(a_time_idx);
 
   old_solution = solution;
   // Also set braid solution to the new solution
@@ -229,13 +226,6 @@ template<int dim>
 int HeatEquation<dim>::size() const
 {
   return solution.size();
-}
-
-
-template<int dim> double
-HeatEquation<dim>::dt() const
-{
-  return time_step;
 }
 
 template<int dim> void

@@ -12,8 +12,10 @@ int my_Step(braid_App        app,
   int level;
   double deltaT;
 
+  int index;
   braid_StepStatusGetLevel(status, &level);
   braid_StepStatusGetTstartTstop(status, &tstart, &tstop);
+  braid_StepStatusGetTIndex(status, &index);
 
   deltaT = tstop - tstart;
 
@@ -21,7 +23,7 @@ int my_Step(braid_App        app,
 
   HeatEquation<2>& heateq = app->eq;
 
-  heateq.step(solution, deltaT);
+  heateq.step(solution, deltaT, tstart, index);
 
   return 0;
 }
@@ -78,30 +80,6 @@ int my_Sum(braid_App app,
 {
   Vector<double>& vec = y->data;
   vec.sadd(beta, alpha, x->data);
-  return 0;
-}
-
-int
-my_TimeGrid(braid_App   app,
-            braid_Real *ta,
-            braid_Int  *ilower,
-            braid_Int  *iupper)
-{
-  double dt = app->eq.dt();
-  int lower, upper;
-  lower = *ilower;
-  upper = *iupper;
-
-  for (int i = lower; i != upper; ++i)
-    {
-      ta[i-lower] = dt;
-    }
-    
-  std::cout << "lower: " << lower << " upper: " << upper << std::endl;
-  for (int i=0; i != upper; ++i)
-    {
-      std::cout << "ta: " << ta[i] << std::endl;
-    }
   return 0;
 }
 

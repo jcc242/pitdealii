@@ -37,15 +37,6 @@ my_Init(braid_App     app,
   int size = app->eq.size();
   u->data.reinit(size);
 
-  if(t < 0)
-    {
-      double halfsize = u->data.size()/2.;
-      for (int i = 0; i != u->data.size(); ++i)
-        {
-          u->data[i] = (i-halfsize)*(i-halfsize)*t;
-        }
-    }
-
   *u_ptr = u;
 
   return 0;
@@ -57,7 +48,12 @@ my_Clone(braid_App     app,
          braid_Vector *v_ptr)
 {
   my_Vector *v = new(my_Vector);
-  v->data = u->data;
+  int size = u->data.size();
+  v->data.reinit(size);
+  for(size_t i=0, end=v->data.size(); i != end; ++i)
+    {
+      v->data[i] = u->data[i];
+    }
   *v_ptr = v;
 
   return 0;
@@ -67,7 +63,7 @@ int
 my_Free(braid_App    app,
         braid_Vector u)
 {
-  free(u);
+  delete u;
 
   return 0;
 }
@@ -80,6 +76,7 @@ int my_Sum(braid_App app,
 {
   Vector<double>& vec = y->data;
   vec.sadd(beta, alpha, x->data);
+
   return 0;
 }
 
@@ -91,6 +88,7 @@ my_SpatialNorm(braid_App     app,
   double dot = 0.0;
   dot = u->data.l2_norm();
   *norm_ptr = dot;
+
   return 0;
 }
 
@@ -132,6 +130,7 @@ my_BufSize(braid_App           app,
 {
   int size = app->eq.size();
   *size_ptr = (size+1)*sizeof(double);
+
   return 0;
 }
 
@@ -149,6 +148,7 @@ my_BufPack(braid_App           app,
       dbuffer[i+1] = (u->data)[i];
     }
   braid_BufferStatusSetSize(bstatus, (size+1)*sizeof(double));
+
   return 0;
 }
 
@@ -169,5 +169,6 @@ my_BufUnpack(braid_App           app,
       (u->data)[i] = dbuffer[i+1];
     }
   *u_ptr = u;
+
   return 0;
 }

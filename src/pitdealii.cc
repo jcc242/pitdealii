@@ -59,20 +59,20 @@ int main(int argc, char *argv[])
 
       /* Define XBraid parameters
        * See -help message forf descriptions */
-      int       max_levels    = 1;
+      int       max_levels    = 2;
       // int       nrelax        = 1;
       // int       skip          = 0;
-      // double    tol           = 1.0e-07;
+      double    tol           = 0.; //1.e-7;
       // int       cfactor       = 2;
-      // int       max_iter      = 30;
+      int       max_iter      = 3;
       // int       min_coarse    = 3;
       // int       fmg           = 0;
       // int       scoarsen      = 0;
       // int       res           = 0;
       // int       wrapper_tests = 0;
-      int       print_level   = 2;
+      int       print_level   = 1;
       int       access_level  = 1;
-      // int       use_sequential= 0;
+      int       use_sequential= 1;
 
       braid_SetPrintLevel( core, print_level);
       braid_SetAccessLevel( core, access_level);
@@ -80,15 +80,19 @@ int main(int argc, char *argv[])
       //       braid_SetMinCoarse( core, min_coarse );
       //       braid_SetSkip(core, skip);
       //       braid_SetNRelax(core, -1, nrelax);
-      //       braid_SetAbsTol(core, tol);
+      braid_SetAbsTol(core, tol);
       //       braid_SetCFactor(core, -1, cfactor);
-      //       braid_SetMaxIter(core, max_iter);
-      //      braid_SetSeqSoln(core, use_sequential);
+      braid_SetMaxIter(core, max_iter);
+      braid_SetSeqSoln(core, use_sequential);
+
       app->eq.define();
 
       braid_Drive(core);
 
+      // Free the memory now that we are done
       braid_Destroy(core);
+
+      delete app;
 
       // Clean up MPI
       // MPI_Comm_free(&comm);

@@ -36,12 +36,15 @@ SET(TEST_SRC
   ${TEST_SRC_PATH}/test_braid.cc
   )
 
+OPTION(USE_MPI "Build MPI version" ON)
+
 include_directories(AFTER ${INCLUDE_PATH})
 
+if(USE_MPI)
 find_package(MPI REQUIRED)
 include_directories(${MPI_INCLUDE_PATH})
 add_definitions(-DUSE_MPI)
-
+endif(USE_MPI)
 
 FIND_PACKAGE(deal.II 9.0.0 QUIET
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} $ENV{HOME}/Sources/builddealii ../../../builddealii ../ ../../ $ENV{DEAL_II_DIR}
@@ -77,19 +80,23 @@ add_executable(${MAIN_NAME} ${MAIN_SRC})
 target_link_libraries(${MAIN_NAME} ${LIB_NAME}) # link my library
 target_link_libraries(${MAIN_NAME} ${BRAID_DIR}/libbraid.a) # link braid
 DEAL_II_SETUP_TARGET(${MAIN_NAME}) # Link dealii
+if(USE_MPI)
 set_target_properties(${MAIN_NAME} PROPERTIES
   LINK_FLAGS "${MPI_LINK_FLAGS}") # Link MPI
 set_target_properties(${MAIN_NAME} PROPERTIES
   COMPILE_FLAGS "${MPI_COMPILE_FLAGS}") # Use MPI compile flags
+endif(USE_MPI)
 
 # Build the reference
 add_executable(${REFERENCE_NAME} ${REFERENCE_SRC})
 target_link_libraries(${REFERENCE_NAME} ${LIB_NAME}) # link my library
 DEAL_II_SETUP_TARGET(${REFERENCE_NAME}) # Link dealii
+if(USE_MPI)
 set_target_properties(${REFERENCE_NAME} PROPERTIES
   LINK_FLAGS "${MPI_LINK_FLAGS}")
 set_target_properties(${REFERENCE_NAME} PROPERTIES
   COMPILE_FLAGS "${MPI_COMPILE_FLAGS}") # Use MPI compile flags
+endif(USE_MPI)
 
 # Lastly build the tests
 enable_testing()

@@ -49,10 +49,12 @@ public:
   void dump_vec(std::ofstream& file,
                 const Vector<double>& vector) const;
 
+  void output_results(int a_time_idx,
+                      Vector<double>& a_solution) const;
+
 private:
   void setup_system();
   void solve_time_step();
-  void output_results(int a_time_idx) const;
 
   Triangulation<dim>   triangulation;
   FE_Q<dim>            fe;

@@ -59,20 +59,20 @@ int main(int argc, char *argv[])
 
       /* Define XBraid parameters
        * See -help message forf descriptions */
-      int       max_levels    = 2;
+      int       max_levels    = 5;
       // int       nrelax        = 1;
       // int       skip          = 0;
-      double    tol           = 0.; //1.e-7;
+      double    tol           = 1.e-4;
       // int       cfactor       = 2;
       int       max_iter      = 3;
-      // int       min_coarse    = 3;
+      // int       min_coarse    = 10;
       // int       fmg           = 0;
       // int       scoarsen      = 0;
       // int       res           = 0;
       // int       wrapper_tests = 0;
       int       print_level   = 1;
       int       access_level  = 1;
-      int       use_sequential= 1;
+      // int       use_sequential= 1;
 
       braid_SetPrintLevel( core, print_level);
       braid_SetAccessLevel( core, access_level);
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
       braid_SetAbsTol(core, tol);
       //       braid_SetCFactor(core, -1, cfactor);
       braid_SetMaxIter(core, max_iter);
-      braid_SetSeqSoln(core, use_sequential);
+      // braid_SetSeqSoln(core, use_sequential);
 
       app->eq.define();
 

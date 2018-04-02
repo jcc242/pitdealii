@@ -33,7 +33,14 @@ my_Init(braid_App     app,
         double        t,
         braid_Vector *u_ptr)
 {
-  my_Vector *u = new(my_Vector);
+    commentssharesavehidereportcrosspost
+
+5
+152
+
+Https (i.redd.it)
+
+submitted 3 hours ago   my_Vector *u = new(my_Vector);
   int size = app->eq.size();
   u->data.reinit(size);
 
@@ -98,27 +105,22 @@ my_Access(braid_App          app,
           braid_AccessStatus astatus)
 {
   // int        index, rank, level, done;
-  // double     t, error;
+  double     t;
+  int index, iter, done;
 
-  // std::cout << "Access hit here: " << std::endl;
-  // braid_AccessStatusGetT(astatus, &t);
-  // braid_AccessStatusGetTIndex(astatus, &index);
-  // braid_AccessStatusGetLevel(astatus, &level);
-  // braid_AccessStatusGetDone(astatus, &done);
+  braid_AccessStatusGetT(astatus, &t);
+  braid_AccessStatusGetTIndex(astatus, &index);
+  braid_AccessStatusGetDone(astatus, &done);
+  braid_AccessStatusGetIter(astatus, &iter);
 
-  // std::cout << "Result: " << std::endl
-  //           << "\ttime: " << t << "\n"
-  //           << "\tindex: " << index << "\n"
-  //           << "\tlevel: " << level << "\n"
-  //           << "\tdone?: " << done << "\n"
-  //           << "NumElements: " << u->data.size() << std::endl;
+  // pout() << "Result: " << std::endl
+  //        << "\ttime: " << t << "\n"
+  //        << "\tindex: " << index << "\n"
+  //        << "\titer: " << iter << "\n"
+  //        << "\tdone?: " << done << "\n"
+  //        << "NumElements: " << u->data.size() << std::endl;
 
-  // std::cout << "Vec: ";
-  // for(int i = 0; i != u->data.size(); ++i)
-  //   {
-  //     std::cout << " " << u->data[i];
-  //   }
-  // std::cout << std::endl;
+  app->eq.output_results(index, u->data);
 
   return 0;
 }

@@ -82,6 +82,7 @@ void HeatEquation<dim>::setup_system()
                                        laplace_matrix);
 
   solution.reinit(dof_handler.n_dofs());
+
   old_solution.reinit(dof_handler.n_dofs());
   system_rhs.reinit(dof_handler.n_dofs());
 }
@@ -90,7 +91,7 @@ void HeatEquation<dim>::setup_system()
 template <int dim>
 void HeatEquation<dim>::solve_time_step()
 {
-  SolverControl solver_control(1000, 1e-8 * system_rhs.l2_norm());
+  SolverControl solver_control(1000, 1.e-10 * system_rhs.l2_norm());
   SolverCG<> cg(solver_control);
 
   PreconditionSSOR<> preconditioner;
@@ -108,33 +109,28 @@ void HeatEquation<dim>::solve_time_step()
 
 
 template <int dim>
-void HeatEquation<dim>::output_results(int a_time_idx) const
+void HeatEquation<dim>::output_results(int a_time_idx,
+                                       Vector<double>& a_solution) const
 {
   DataOut<dim> data_out;
 
   data_out.attach_dof_handler(dof_handler);
-  data_out.add_data_vector(solution, "U");
+  data_out.add_data_vector(a_solution, "U");
 
   data_out.build_patches();
 
-  const std::string filename = "solution-seq-parallel-"
+  const std::string filename = "solution-parallel-"
     + Utilities::int_to_string(a_time_idx, 3) +
     ".vtk";
   std::ofstream output(filename.c_str());
   data_out.write_vtk(output);
-
-  const std::string filename2 = "solution-seq-parallel-"
-    + Utilities::int_to_string(a_time_idx, 3) +
-    ".gpl";
-  std::ofstream output2(filename2.c_str());
-  data_out.write_gnuplot(output2);
 }
 
 // This function won't make much sense in real parallel in time...
 template <int dim>
 void HeatEquation<dim>::define()
 {
-  const unsigned int initial_global_refinement = 1;
+  const unsigned int initial_global_refinement = 4;
 
   GridGenerator::hyper_L (triangulation);
   triangulation.refine_global (initial_global_refinement);
@@ -151,7 +147,7 @@ void HeatEquation<dim>::define()
 
   int time_step = 0;
 
-  output_results(time_step);
+  output_results(time_step, solution);
 }
 
 template<int dim>
@@ -215,7 +211,6 @@ void HeatEquation<dim>::step(Vector<double>& braid_data,
 
   solve_time_step();
 
-  output_results(a_time_idx);
 
   old_solution = solution;
   // Also set braid solution to the new solution

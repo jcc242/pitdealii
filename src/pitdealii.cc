@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
       braid_Core core;
       double tstart = 0.0;
       double tstop = 0.5;
-      double ntime = 250;
+      double ntime = 2500;
       my_App *app = new(my_App);
 
 
@@ -59,10 +59,10 @@ int main(int argc, char *argv[])
 
       /* Define XBraid parameters
        * See -help message forf descriptions */
-      int       max_levels    = 5;
+      int       max_levels    = 2;
       // int       nrelax        = 1;
       // int       skip          = 0;
-      double    tol           = 1.e-4;
+      double    tol           = 1.e-7;
       // int       cfactor       = 2;
       int       max_iter      = 3;
       // int       min_coarse    = 10;
@@ -124,3 +124,4 @@ int main(int argc, char *argv[])
 
   return 0;
 }
+

@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
       // int       skip          = 0;
       double    tol           = 1.e-7;
       // int       cfactor       = 2;
-      int       max_iter      = 3;
+      int       max_iter      = 5;
       // int       min_coarse    = 10;
       // int       fmg           = 0;
       // int       scoarsen      = 0;

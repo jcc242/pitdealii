@@ -103,7 +103,7 @@ my_Access(braid_App          app,
   double     t;
   int index, iter, done;
 
-  // braid_AccessStatusGetT(astatus, &t);
+  braid_AccessStatusGetT(astatus, &t);
   braid_AccessStatusGetTIndex(astatus, &index);
   // braid_AccessStatusGetDone(astatus, &done);
   // braid_AccessStatusGetIter(astatus, &iter);

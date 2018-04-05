@@ -53,6 +53,9 @@ public:
                       double a_time,
                       Vector<double>& a_solution) const;
 
+  void initialize(double a_time,
+                  Vector<double>& a_vector) const;
+
 private:
   void setup_system();
   void solve_time_step();
@@ -107,6 +110,15 @@ public:
   virtual double value (const Point<dim>  &p,
                         const unsigned int component = 0) const;
 };
+
+template <int dim>
+class InitialValues : public Function<dim>
+{
+public:
+  virtual double value (const Point<dim> &p,
+                        const unsigned int component = 0) const;
+};
+
 
 #include "HeatEquationImplem.hh"
 

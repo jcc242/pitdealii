@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 14)
 
 # Set the name of the project and target:
 SET(TARGET "pitdealii")
@@ -56,6 +56,7 @@ IF(NOT ${deal.II_FOUND})
     "or set an environment variable \"DEAL_II_DIR\" that contains this path."
     )
 ENDIF()
+include_directories(${DEAL_II_INCLUDE_DIRS})
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 

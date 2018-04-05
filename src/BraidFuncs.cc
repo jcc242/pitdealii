@@ -37,6 +37,8 @@ my_Init(braid_App     app,
   int size = app->eq.size();
   u->data.reinit(size);
 
+  app->eq.initialize(t, u->data);
+
   *u_ptr = u;
 
   return 0;
@@ -101,17 +103,10 @@ my_Access(braid_App          app,
   double     t;
   int index, iter, done;
 
-  braid_AccessStatusGetT(astatus, &t);
+  // braid_AccessStatusGetT(astatus, &t);
   braid_AccessStatusGetTIndex(astatus, &index);
-  braid_AccessStatusGetDone(astatus, &done);
-  braid_AccessStatusGetIter(astatus, &iter);
-
-  // pout() << "Result: " << std::endl
-  //        << "\ttime: " << t << "\n"
-  //        << "\tindex: " << index << "\n"
-  //        << "\titer: " << iter << "\n"
-  //        << "\tdone?: " << done << "\n"
-  //        << "NumElements: " << u->data.size() << std::endl;
+  // braid_AccessStatusGetDone(astatus, &done);
+  // braid_AccessStatusGetIter(astatus, &iter);
 
   app->eq.output_results(index, t, u->data);
 

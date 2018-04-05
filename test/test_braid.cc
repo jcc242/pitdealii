@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 //     braid_TestAll(app, comm_x, stdout, 0.0, (tstop-tstart)/ntime,
 //                   2*(tstop-tstart)/ntime, my_Init, my_Free, my_Clone,
 //                   my_Sum, my_SpatialNorm, my_BufSize, my_BufPack,
-//                   my_BufUnpack, my_Coarhttps://www.google.com/sen, my_Interp, my_Residual, my_Step);
+//                   my_BufUnpack, my_Coarsen, my_Interp, my_Residual, my_Step);
 
   /* Finalize MPI */
   MPI_Finalize();

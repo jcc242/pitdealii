@@ -24,6 +24,8 @@ double RightHandSide<dim>::value (const Point<dim> &p,
     {
       return 0;
     }
+
+  return 0; // No forcing function
 }
 
 template <int dim>
@@ -36,12 +38,47 @@ double BoundaryValues<dim>::value (const Point<dim> &/*p*/,
 }
 
 template <int dim>
+double InitialValues<dim>::value (const Point<dim> &p,
+                                   const unsigned int component) const
+{
+  (void) component;
+  Assert (component == 0, ExcIndexRange(component, 0, 1));
+
+  // Center the initial spike at (-0.5, -0.5)
+  Point<dim> center (-0.5, -0.5);
+  // Calculate the distance from this center
+  const double distance = center.distance(p);
+  // Calculate the gaussian using this distance
+  return std::exp(-0.5*(distance)*(distance)/(0.05));
+}
+
+template <int dim>
 HeatEquation<dim>::HeatEquation ()
   :
   fe(1),
   dof_handler(triangulation),
   theta(0.5)
 {
+}
+
+template <int dim>
+void HeatEquation<dim>::initialize(double a_time,
+                                   Vector<double>& a_vector) const
+{
+  // // std::cout << "Initializing at time: " << a_time << std::endl;
+  // if(std::abs(a_time-0.)<1e-7)
+  //   {
+  //     // std::cout << "Doing function initialization" << std::endl;
+  //     VectorTools::project (dof_handler, constraints,
+  //                           QGauss<dim>(fe.degree+1), InitialValues<dim>(),
+  //                           a_vector);
+  //   }
+  // else
+  //   {
+  //     // std::cout << "Doing zero initialization" << std::endl;
+  //     a_vector.reinit(a_vector.size());
+  //   }
+  a_vector.reinit(a_vector.size());
 }
 
 template <int dim>
@@ -126,7 +163,7 @@ void HeatEquation<dim>::output_results(int a_time_idx,
 
   data_out.build_patches();
 
-  const std::string filename = "solution-parallel-"
+  const std::string filename = "solution-"
     + Utilities::int_to_string(a_time_idx, 3) +
     ".vtk";
   std::ofstream output(filename.c_str());

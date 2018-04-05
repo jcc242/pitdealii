@@ -50,6 +50,7 @@ public:
                 const Vector<double>& vector) const;
 
   void output_results(int a_time_idx,
+                      double a_time,
                       Vector<double>& a_solution) const;
 
 private:

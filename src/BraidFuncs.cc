@@ -33,14 +33,7 @@ my_Init(braid_App     app,
         double        t,
         braid_Vector *u_ptr)
 {
-    commentssharesavehidereportcrosspost
-
-5
-152
-
-Https (i.redd.it)
-
-submitted 3 hours ago   my_Vector *u = new(my_Vector);
+  my_Vector *u = new(my_Vector);
   int size = app->eq.size();
   u->data.reinit(size);
 
@@ -120,7 +113,7 @@ my_Access(braid_App          app,
   //        << "\tdone?: " << done << "\n"
   //        << "NumElements: " << u->data.size() << std::endl;
 
-  app->eq.output_results(index, u->data);
+  app->eq.output_results(index, t, u->data);
 
   return 0;
 }

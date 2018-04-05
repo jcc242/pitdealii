@@ -110,9 +110,16 @@ void HeatEquation<dim>::solve_time_step()
 
 template <int dim>
 void HeatEquation<dim>::output_results(int a_time_idx,
+                                       double a_time,
                                        Vector<double>& a_solution) const
 {
+
+  DataOutBase::VtkFlags vtk_flags;
+  vtk_flags.time = a_time;
+  vtk_flags.cycle = a_time_idx;
+
   DataOut<dim> data_out;
+  data_out.set_flags(vtk_flags);
 
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(a_solution, "U");
@@ -146,8 +153,9 @@ void HeatEquation<dim>::define()
   solution = old_solution;
 
   int time_step = 0;
+  double time = 0.;
 
-  output_results(time_step, solution);
+  output_results(time_step, time, solution);
 }
 
 template<int dim>

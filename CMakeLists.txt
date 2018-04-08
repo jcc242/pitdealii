@@ -37,6 +37,7 @@ SET(TEST_SRC
   )
 
 OPTION(USE_MPI "Build MPI version" ON)
+OPTION(DO_MFG "Do the manufactured solution run" OFF)
 
 include_directories(AFTER ${INCLUDE_PATH})
 
@@ -45,6 +46,10 @@ find_package(MPI REQUIRED)
 include_directories(${MPI_INCLUDE_PATH})
 add_definitions(-DUSE_MPI)
 endif(USE_MPI)
+
+if(DO_MFG)
+  add_definitions(-DDO_MFG)
+endif(DO_MFG)
 
 FIND_PACKAGE(deal.II 9.0.0 QUIET
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} $ENV{HOME}/Sources/builddealii ../../../builddealii ../ ../../ $ENV{DEAL_II_DIR}

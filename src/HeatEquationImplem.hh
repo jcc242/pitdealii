@@ -29,8 +29,25 @@ double RightHandSide<dim>::value (const Point<dim> &p,
 }
 
 template <int dim>
-double BoundaryValues<dim>::value (const Point<dim> &/*p*/,
-                                   const unsigned int component) const
+double RightHandSideMFG<dim>::value (const Point<dim> &p,
+                                     const unsigned int component) const
+{
+  (void) component;
+  Assert (component == 0, ExcIndexRange(component, 0, 1));
+  Assert (dim == 2, ExcNotImplemented());
+
+  double time = this->get_time();
+
+  // return the manufactured solution of the right hand side
+  double pi = numbers::PI;
+  return 4*pi*pi*std::exp(-4*pi*pi*time)
+    *std::cos(2*numbers::PI*p[0])
+    *std::cos(2*numbers::PI*p[1]);
+}
+
+template <int dim>
+double BoundaryValues<dim>::value (const Point<dim> &p,
+                            const unsigned int component) const
 {
   (void) component;
   Assert (component == 0, ExcIndexRange(component, 0, 1));
@@ -38,18 +55,25 @@ double BoundaryValues<dim>::value (const Point<dim> &/*p*/,
 }
 
 template <int dim>
-double InitialValues<dim>::value (const Point<dim> &p,
+double ExactValuesMFG<dim>::value (const Point<dim> &p,
                                    const unsigned int component) const
 {
   (void) component;
   Assert (component == 0, ExcIndexRange(component, 0, 1));
 
-  // Center the initial spike at (-0.5, -0.5)
-  Point<dim> center (-0.5, -0.5);
-  // Calculate the distance from this center
-  const double distance = center.distance(p);
-  // Calculate the gaussian using this distance
-  return std::exp(-0.5*(distance)*(distance)/(0.05));
+  double time = this->get_time();
+  // Return our manufactured solution boundary value
+  return std::exp(-4*numbers::PI*numbers::PI*time)*std::cos(2*numbers::PI*p[0])*std::cos(2*numbers::PI*p[1]);
+}
+
+template <int dim>
+double InitialValuesMFG<dim>::value (const Point<dim> &p,
+                                     const unsigned int component) const
+{
+  (void) component;
+  Assert (component == 0, ExcIndexRange(component, 0, 1));
+  // Return our manufactured solution initial value
+  return std::cos(2*numbers::PI*p[0])*std::cos(2*numbers::PI*p[1]);
 }
 
 template <int dim>
@@ -65,20 +89,15 @@ template <int dim>
 void HeatEquation<dim>::initialize(double a_time,
                                    Vector<double>& a_vector) const
 {
-  // // std::cout << "Initializing at time: " << a_time << std::endl;
-  // if(std::abs(a_time-0.)<1e-7)
-  //   {
-  //     // std::cout << "Doing function initialization" << std::endl;
-  //     VectorTools::project (dof_handler, constraints,
-  //                           QGauss<dim>(fe.degree+1), InitialValues<dim>(),
-  //                           a_vector);
-  //   }
-  // else
-  //   {
-  //     // std::cout << "Doing zero initialization" << std::endl;
-  //     a_vector.reinit(a_vector.size());
-  //   }
-  a_vector.reinit(a_vector.size());
+#if DO_MFG
+  // We only initialize values in the manufactured solution case
+  InitialValuesMFG<dim> iv_function;
+  iv_function.set_time(a_time);
+  VectorTools::project (dof_handler, constraints,
+                        QGauss<dim>(fe.degree+1), iv_function,
+                        a_vector);
+#endif // DO_MFG
+  // If not the MFG solution case, a_vector is already zero'd so do nothing
 }
 
 template <int dim>
@@ -138,9 +157,6 @@ void HeatEquation<dim>::solve_time_step()
            preconditioner);
 
   constraints.distribute(solution);
-
-  pout() << "     " << solver_control.last_step()
-         << " CG iterations." << std::endl;
 }
 
 
@@ -174,7 +190,7 @@ void HeatEquation<dim>::output_results(int a_time_idx,
 template <int dim>
 void HeatEquation<dim>::define()
 {
-  const unsigned int initial_global_refinement = 4;
+  const unsigned int initial_global_refinement = 3;
 
   GridGenerator::hyper_L (triangulation);
   triangulation.refine_global (initial_global_refinement);
@@ -191,7 +207,7 @@ void HeatEquation<dim>::define()
 
   int time_step = 0;
   double time = 0.;
-
+  initialize(time, solution);
   output_results(time_step, time, solution);
 }
 
@@ -212,7 +228,11 @@ void HeatEquation<dim>::step(Vector<double>& braid_data,
 
   system_rhs.add(-(1 - theta) * deltaT, tmp);
 
+#if DO_MFG
+  RightHandSideMFG<dim> rhs_function;
+#else
   RightHandSide<dim> rhs_function;
+#endif
   rhs_function.set_time(a_time);
   VectorTools::create_right_hand_side(dof_handler,
                                       QGauss<dim>(fe.degree+1),
@@ -238,7 +258,12 @@ void HeatEquation<dim>::step(Vector<double>& braid_data,
   constraints.condense (system_matrix, system_rhs);
 
   {
+#if DO_MFG
+    // Set boundary to exact value in MFG solution
+    ExactValuesMFG<dim> boundary_values_function;
+#else
     BoundaryValues<dim> boundary_values_function;
+#endif
     boundary_values_function.set_time(a_time);
 
     std::map<types::global_dof_index, double> boundary_values;
@@ -251,7 +276,6 @@ void HeatEquation<dim>::step(Vector<double>& braid_data,
                                        system_matrix,
                                        solution,
                                        system_rhs);
-    // system_rhs different here
   }
 
   solve_time_step();
@@ -278,4 +302,18 @@ HeatEquation<dim>::dump_vec(std::ofstream& file,
       file << "\n" << vector[i];
     }
   file << std::endl;
+}
+
+template<int dim> void
+HeatEquation<dim>::computeMFG(double a_time,
+                              Vector<double>& a_vector) const
+{
+  // Compute the exact value for the manufactured solution case
+  ExactValuesMFG<dim> exact_function;
+  exact_function.set_time(a_time);
+
+  VectorTools::project (dof_handler, constraints,
+                        QGauss<dim>(fe.degree+1), exact_function,
+                        a_vector);
+
 }

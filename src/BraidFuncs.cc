@@ -101,14 +101,28 @@ my_Access(braid_App          app,
 {
   // int        index, rank, level, done;
   double     t;
-  int index, iter, done;
+  int index;
 
   braid_AccessStatusGetT(astatus, &t);
   braid_AccessStatusGetTIndex(astatus, &index);
-  // braid_AccessStatusGetDone(astatus, &done);
-  // braid_AccessStatusGetIter(astatus, &iter);
+
 
   app->eq.output_results(index, t, u->data);
+
+#if DO_MFG
+  int iter, done;
+  braid_AccessStatusGetDone(astatus, &done);
+  braid_AccessStatusGetIter(astatus, &iter);
+  Vector<double> exact;
+  exact.reinit(u->data.size());
+  app->eq.computeMFG(t, exact);
+
+  exact -= u->data;
+
+  double error;
+  error = exact.l2_norm();
+  pout() << "Error at iter: " << iter << "\tstep: " << index << "\t" << error << std::endl;
+#endif
 
   return 0;
 }

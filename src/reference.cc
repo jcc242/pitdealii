@@ -168,7 +168,7 @@ namespace Reference
     fe(1),
     dof_handler(triangulation),
     time (0.0),
-    time_step(1. / 500),
+    time_step(1. / 5000),
     timestep_number (0),
     theta(0.5)
   {}
@@ -253,12 +253,6 @@ namespace Reference
       ".vtk";
     std::ofstream output(filename.c_str());
     data_out.write_vtk(output);
-
-    const std::string filename2 = "reference-"
-      + Utilities::int_to_string(timestep_number, 3) +
-      ".gpl";
-    std::ofstream output2(filename2.c_str());
-    data_out.write_gnuplot(output2);
   }
 
 
@@ -317,7 +311,7 @@ namespace Reference
   template <int dim>
   void HeatEquation<dim>::run()
   {
-    const unsigned int initial_global_refinement = 1;
+    const unsigned int initial_global_refinement = 3;
 
     GridGenerator::hyper_L (triangulation);
     triangulation.refine_global (initial_global_refinement);

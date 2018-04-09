@@ -1,0 +1,40 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+
+\begin{document}
+
+\section{Manufactured Solution}
+\label{sec:MFGSol}
+
+The method of manufactured solutions is used to verify the implementation of the
+parallel in time algorithm.
+The method of manufactured solutions specifies a field $u_h$ and an
+analytical values for the right hand side, initial conditions, and boundary
+conditions is determined.
+Once the analytical values are known, they are plugged into the original sovler
+and the value of $u$ from the solver is compared to the specified $u_h$ to
+determine the error.
+
+For the heat equation,
+\begin{align*}
+  \frac{\partial u}{\partial t} - \Delta u = f(\boldsymbol{x},t), \qquad &\forall\boldsymbol{x}\in\Omega,t\in\left( 0,T \right), \\
+  u(\boldsymbol{x},0) = u_0(\boldsymbol{x}), \qquad &\forall \boldsymbol{x}\in\Omega, \\
+  u(\boldsymbol{x},t) = g(\boldsymbol{x},t), \qquad &\forall \boldsymbol{x}\in\partial\Omega,t\in\left( 0,T \right).
+\end{align*}
+the field $u_h$ is specified as,
+\begin{align*}
+  u_h = e^{-4\pi^2t}cos(2 \pi x)cos(2 \pi y), \qquad \forall \boldsymbol{x} \in \Omega \cup \partial\Omega
+\end{align*}
+which gives us the values of,
+\begin{align*}
+  \frac{\partial u}{\partial t} &= -4 \pi^2 e^{-4\pi^2t}cos(2 \pi x)cos(2 \pi y), \\
+  -\Delta u &= 8 \pi^2 e^{-4\pi^2t}cos(2 \pi x)cos(2 \pi y)
+\end{align*}
+and therefore we specify the terms from the governing equations as,
+\begin{align*}
+  f(\boldsymbol{x},t) = 4 \pi^2 e^{-4\pi^2t}cos(2 \pi x)cos(2 \pi y), \qquad&\forall\boldsymbol{x}\in\Omega,t\in\left( 0,T \right), \\
+  u_0(\boldsymbol{x}) = cos(2 \pi x)cos(2 \pi y), \qquad &\forall \boldsymbol{x}\in\Omega, \\
+  g(\boldsymbol{x},t) = e^{-4\pi^2t}cos(2 \pi x)cos(2 \pi y), \qquad &\forall \boldsymbol{x} \in \partial\Omega.
+\end{align*}
+\end{document}

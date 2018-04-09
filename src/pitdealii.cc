@@ -86,6 +86,7 @@ int main(int argc, char *argv[])
       // braid_SetSeqSoln(core, use_sequential);
 
       app->eq.define();
+      app->final_step = ntime;
 
       braid_Drive(core);
 

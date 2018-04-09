@@ -110,18 +110,11 @@ my_Access(braid_App          app,
   app->eq.output_results(index, t, u->data);
 
 #if DO_MFG
-  int iter, done;
-  braid_AccessStatusGetDone(astatus, &done);
-  braid_AccessStatusGetIter(astatus, &iter);
-  Vector<double> exact;
-  exact.reinit(u->data.size());
-  app->eq.computeMFG(t, exact);
-
-  exact -= u->data;
-
-  double error;
-  error = exact.l2_norm();
-  pout() << "Error at iter: " << iter << "\tstep: " << index << "\t" << error << std::endl;
+  if(index == app->final_step)
+    {
+      pout() << "Doing error calc of step: " << index << std::endl;
+      app->eq.process_solution(t, index, u->data);
+    }
 #endif
 
   return 0;

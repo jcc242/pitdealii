@@ -24,6 +24,7 @@ typedef struct _braid_Vector_struct
 typedef struct _braid_App_struct
 {
   HeatEquation<2> eq;
+  int final_step;
 } my_App;
 
 

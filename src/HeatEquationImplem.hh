@@ -202,7 +202,7 @@ void HeatEquation<dim>::output_results(int a_time_idx,
 template <int dim>
 void HeatEquation<dim>::define()
 {
-  const unsigned int initial_global_refinement = 3;
+  const unsigned int initial_global_refinement = 2;
 
   GridGenerator::hyper_L (triangulation);
   triangulation.refine_global (initial_global_refinement);
@@ -219,8 +219,8 @@ void HeatEquation<dim>::define()
 
   int time_step = 0;
   double time = 0.;
-  initialize(time, solution);
-  output_results(time_step, time, solution);
+  // initialize(time, solution);
+  // output_results(time_step, time, solution);
 }
 
 template<int dim>

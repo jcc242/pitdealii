@@ -168,7 +168,7 @@ namespace Reference
     fe(1),
     dof_handler(triangulation),
     time (0.0),
-    time_step(1. / 5000),
+    time_step(1. / 50000),
     timestep_number (0),
     theta(0.5)
   {}
@@ -180,14 +180,14 @@ namespace Reference
   {
     dof_handler.distribute_dofs(fe);
 
-    std::cout << std::endl
-              << "==========================================="
-              << std::endl
-              << "Number of active cells: " << triangulation.n_active_cells()
-              << std::endl
-              << "Number of degrees of freedom: " << dof_handler.n_dofs()
-              << std::endl
-              << std::endl;
+    // std::cout << std::endl
+    //           << "==========================================="
+    //           << std::endl
+    //           << "Number of active cells: " << triangulation.n_active_cells()
+    //           << std::endl
+    //           << "Number of degrees of freedom: " << dof_handler.n_dofs()
+    //           << std::endl
+    //           << std::endl;
 
     constraints.clear ();
     DoFTools::make_hanging_node_constraints (dof_handler,
@@ -232,8 +232,8 @@ namespace Reference
 
     constraints.distribute(solution);
 
-    std::cout << "     " << solver_control.last_step()
-              << " CG iterations." << std::endl;
+    // std::cout << "     " << solver_control.last_step()
+    //           << " CG iterations." << std::endl;
   }
 
 
@@ -311,7 +311,7 @@ namespace Reference
   template <int dim>
   void HeatEquation<dim>::run()
   {
-    const unsigned int initial_global_refinement = 3;
+    const unsigned int initial_global_refinement = 2;
 
     GridGenerator::hyper_L (triangulation);
     triangulation.refine_global (initial_global_refinement);
@@ -330,15 +330,15 @@ namespace Reference
                              old_solution);
     solution = old_solution;
 
-    output_results();
+    // output_results();
 
     while (time <= 0.5)
       {
         time += time_step;
         ++timestep_number;
 
-        std::cout << "Time step " << timestep_number << " at t=" << time
-                  << " dt=" << time_step << std::endl;
+        // std::cout << "Time step " << timestep_number << " at t=" << time
+        //           << " dt=" << time_step << std::endl;
 
         mass_matrix.vmult(system_rhs, old_solution);
 
@@ -388,7 +388,8 @@ namespace Reference
 
         solve_time_step();
 
-        output_results();
+        // if(timestep_number % 1000 == 0)
+        //   output_results();
 
         old_solution = solution;
       }

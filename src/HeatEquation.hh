@@ -30,6 +30,7 @@
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/solution_transfer.h>
 #include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/base/convergence_table.h>
 
 using namespace dealii;
 
@@ -56,8 +57,9 @@ public:
   void initialize(double a_time,
                   Vector<double>& a_vector) const;
 
-  void computeMFG(double a_time,
-                  Vector<double>& a_vector) const;
+  void process_solution(double a_time,
+                        int a_index,
+                        const Vector<double>& a_vector);
 
 private:
   void setup_system();
@@ -87,6 +89,8 @@ private:
   // they need to become member data
   Vector<double> tmp;
   Vector<double> forcing_terms;
+
+  ConvergenceTable convergence_table;
 };
 
 template <int dim>
@@ -137,6 +141,9 @@ class ExactValuesMFG : public Function<dim>
 public:
   virtual double value (const Point<dim> &p,
                         const unsigned int component = 0) const;
+
+  virtual Tensor<1,dim> gradient (const Point<dim>   &p,
+                                  const unsigned int  component = 0) const;
 };
 
 

@@ -1,6 +1,7 @@
 \documentclass{article}
 
 \usepackage{amsmath}
+\usepackage{siunitx}
 
 \begin{document}
 
@@ -37,4 +38,60 @@ and therefore we specify the terms from the governing equations as,
   u_0(\boldsymbol{x}) = cos(2 \pi x)cos(2 \pi y), \qquad &\forall \boldsymbol{x}\in\Omega, \\
   g(\boldsymbol{x},t) = e^{-4\pi^2t}cos(2 \pi x)cos(2 \pi y), \qquad &\forall \boldsymbol{x} \in \partial\Omega.
 \end{align*}
+
+The convergence rate of the error is calculated with
+\begin{align*}
+  \Delta \epsilon_n = \frac{\ln{\epsilon_{n-1}/\epsilon_{n}}}{ln{r_n}}
+\end{align*}
+where $\Delta \epsilon_n$ is the convergence rate of error $\epsilon$ between a mesh $n$ and
+coarser mesh $n-1$ that have a refinement ratio of $r_n$.
+Shown in Table~\ref{tbl:convergenceRate} is the convergence rate as the mesh is
+refined.
+The $\Delta t$ is reduced by a factor of 2 for every global refinement of the mesh.
+
+\begin{table}\label{tbl:convergenceRate}
+  \centering
+  \begin{tabular}{c | c | c | c | c | c | c | c}
+    Cycle & Cells & DoFs & L2 Norms & H1 Norms & $\textrm{L}^\infty$ Norm & Slope L2 & Slope $\textrm{L}^\infty$ \\
+    \hline
+    125 & 48 & 65 & 6.036e-03 & 2.085e+00 & 7.557e-03 \\
+    250 & 192 & 225 & 1.735e-03 & 2.054e+00 & 2.721e-03 & 1.798 & 1.474 \\
+    500 & 768 & 833 & 4.513e-04 & 2.045e+00 & 7.410e-04 & 1.943 & 1.877 \\
+    1000 &  3072 & 3201 & 1.140e-04 & 2.043e+00 & 1.877e-04 & 1.985 & 1.981 \\
+    2000 & 12288 & 12545 & 2.859e-05 & 2.042e+00 & 4.715e-05 & 1.995 & 1.993
+  \end{tabular}
+  \caption{Norms of the error as the mesh is globally refined. The code shows a
+    second order convergence rate.}
+\end{table}
+
+\section{Serial in Time Performance}
+\label{sec:SiTPerformance}
+
+Out of curiosity, I compared the wallclock of the reference serial in time case
+against the XBraid implementation run in serial in time.
+The linux performance analysis tool \texttt{perf} is used with the following
+call,
+\begin{verbatim}
+stat -r 50 ./path/to/binary
+\end{verbatim}
+which runs the binary 50 times and collects average and deviation information
+for task clock, wall clock, cycles, and much more.
+The wall clock time is recorded in \ref{tbl:serialPerf} for three different cases.
+\begin{table}\label{tbl:serialPerf}
+  \centering
+  \begin{tabular}{c | c | c | c}
+    Number of Cells & Number of Timesteps & Reference & XBraid Serial \\
+    \hline
+    48 & 2500 & \SI{2.29}{\second} & \SI{3.03}{\second} \\
+    48 & 25000 & \SI{21.86}{\second} & \SI{27.85}{\second} \\
+    192 & 2500 & \SI{5.46}{\second} & \SI{7.44}{\second} \\
+  \end{tabular}
+  \caption{Comparison of the run time with various number of cells and number of
+  timesteps. There is an overhead cost to running serial in time with XBraid.}
+\end{table}
+
+It appears there is an overhead attached to the XBraid serial in time implementation compared
+to the reference serial in time.
+
+
 \end{document}

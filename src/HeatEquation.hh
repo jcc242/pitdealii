@@ -63,7 +63,7 @@ public:
 
 private:
   void setup_system();
-  void solve_time_step();
+  void solve_time_step(Vector<double>& a_solution);
 
   Triangulation<dim>   triangulation;
   FE_Q<dim>            fe;
@@ -76,8 +76,6 @@ private:
   SparseMatrix<double> laplace_matrix;
   SparseMatrix<double> system_matrix;
 
-  Vector<double>       solution;
-  Vector<double>       old_solution;
   Vector<double>       system_rhs;
 
   std::ofstream myfile;

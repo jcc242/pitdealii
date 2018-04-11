@@ -311,7 +311,7 @@ namespace Reference
   template <int dim>
   void HeatEquation<dim>::run()
   {
-    const unsigned int initial_global_refinement = 2;
+    const unsigned int initial_global_refinement = 4;
 
     GridGenerator::hyper_L (triangulation);
     triangulation.refine_global (initial_global_refinement);
@@ -388,7 +388,7 @@ namespace Reference
 
         solve_time_step();
 
-        // if(timestep_number % 1000 == 0)
+        // if(timestep_number % 100 == 0)
         //   output_results();
 
         old_solution = solution;

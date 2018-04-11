@@ -100,14 +100,14 @@ my_Access(braid_App          app,
           braid_AccessStatus astatus)
 {
   // int        index, rank, level, done;
-  double     t;
-  int index;
+  // double     t;
+  // int index;
 
   // braid_AccessStatusGetT(astatus, &t);
-//   braid_AccessStatusGetTIndex(astatus, &index);
+  // braid_AccessStatusGetTIndex(astatus, &index);
 
-//   if(index % 1000 == 0)
-//     app->eq.output_results(index, t, u->data);
+  // if(index % 100 == 0)
+  //   app->eq.output_results(index, t, u->data);
 
 // #if DO_MFG
 //   if(index == app->final_step)

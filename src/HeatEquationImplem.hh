@@ -149,15 +149,12 @@ void HeatEquation<dim>::setup_system()
                                        QGauss<dim>(fe.degree+1),
                                        laplace_matrix);
 
-  solution.reinit(dof_handler.n_dofs());
-
-  old_solution.reinit(dof_handler.n_dofs());
   system_rhs.reinit(dof_handler.n_dofs());
 }
 
 
 template <int dim>
-void HeatEquation<dim>::solve_time_step()
+void HeatEquation<dim>::solve_time_step(Vector<double>& a_solution)
 {
   SolverControl solver_control(1000, 1.e-10 * system_rhs.l2_norm());
   SolverCG<> cg(solver_control);
@@ -165,10 +162,10 @@ void HeatEquation<dim>::solve_time_step()
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.0);
 
-  cg.solve(system_matrix, solution, system_rhs,
+  cg.solve(system_matrix, a_solution, system_rhs,
            preconditioner);
 
-  constraints.distribute(solution);
+  constraints.distribute(a_solution);
 }
 
 
@@ -202,25 +199,18 @@ void HeatEquation<dim>::output_results(int a_time_idx,
 template <int dim>
 void HeatEquation<dim>::define()
 {
-  const unsigned int initial_global_refinement = 2;
+  const unsigned int initial_global_refinement = 4;
 
   GridGenerator::hyper_L (triangulation);
   triangulation.refine_global (initial_global_refinement);
 
   setup_system();
 
-  tmp.reinit (solution.size());
-  forcing_terms.reinit (solution.size());
-
-  VectorTools::interpolate(dof_handler,
-                           Functions::ZeroFunction<dim>(),
-                           old_solution);
-  solution = old_solution;
+  tmp.reinit (dof_handler.n_dofs());
+  forcing_terms.reinit (dof_handler.n_dofs());
 
   int time_step = 0;
   double time = 0.;
-  // initialize(time, solution);
-  // output_results(time_step, time, solution);
 }
 
 template<int dim>
@@ -230,13 +220,13 @@ void HeatEquation<dim>::step(Vector<double>& braid_data,
                              int a_time_idx)
 {
   // Set old solution to the braid data
-  old_solution = braid_data;
+  // old_solution = braid_data;
   a_time += deltaT;
   ++a_time_idx;
 
-  mass_matrix.vmult(system_rhs, old_solution);
+  mass_matrix.vmult(system_rhs, braid_data);
 
-  laplace_matrix.vmult(tmp, old_solution);
+  laplace_matrix.vmult(tmp, braid_data);
 
   system_rhs.add(-(1 - theta) * deltaT, tmp);
 
@@ -286,22 +276,17 @@ void HeatEquation<dim>::step(Vector<double>& braid_data,
 
     MatrixTools::apply_boundary_values(boundary_values,
                                        system_matrix,
-                                       solution,
+                                       braid_data,
                                        system_rhs);
   }
 
-  solve_time_step();
-
-
-  old_solution = solution;
-  // Also set braid solution to the new solution
-  braid_data = solution;
+  solve_time_step(braid_data);
 }
 
 template<int dim>
 int HeatEquation<dim>::size() const
 {
-  return solution.size();
+  return dof_handler.n_dofs();
 }
 
 template<int dim> void

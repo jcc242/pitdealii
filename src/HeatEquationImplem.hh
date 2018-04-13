@@ -66,6 +66,8 @@ double ExactValuesMFG<dim>::value (const Point<dim> &p,
   return std::exp(-4*numbers::PI*numbers::PI*time)*std::cos(2*numbers::PI*p[0])*std::cos(2*numbers::PI*p[1]);
 }
 
+
+// TODO: Find bug in here
 template <int dim>
 Tensor<1,dim> ExactValuesMFG<dim>::gradient (const Point<dim>   &p,
                                              const unsigned int) const
@@ -117,14 +119,14 @@ void HeatEquation<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
-  pout() << std::endl
-         << "==========================================="
-         << std::endl
-         << "Number of active cells: " << triangulation.n_active_cells()
-         << std::endl
-         << "Number of degrees of freedom: " << dof_handler.n_dofs()
-         << std::endl
-         << std::endl;
+  // pout() << std::endl
+  //        << "==========================================="
+  //        << std::endl
+  //        << "Number of active cells: " << triangulation.n_active_cells()
+  //        << std::endl
+  //        << "Number of degrees of freedom: " << dof_handler.n_dofs()
+  //        << std::endl
+  //        << std::endl;
 
   constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
@@ -156,7 +158,7 @@ void HeatEquation<dim>::setup_system()
 template <int dim>
 void HeatEquation<dim>::solve_time_step(Vector<double>& a_solution)
 {
-  SolverControl solver_control(1000, 1.e-10 * system_rhs.l2_norm());
+  SolverControl solver_control(1000, 1e-8 * system_rhs.l2_norm());
   SolverCG<> cg(solver_control);
 
   PreconditionSSOR<> preconditioner;
@@ -166,6 +168,9 @@ void HeatEquation<dim>::solve_time_step(Vector<double>& a_solution)
            preconditioner);
 
   constraints.distribute(a_solution);
+
+  std::cout << "     " << solver_control.last_step()
+            << " CG iterations." << std::endl;
 }
 
 
@@ -199,7 +204,7 @@ void HeatEquation<dim>::output_results(int a_time_idx,
 template <int dim>
 void HeatEquation<dim>::define()
 {
-  const unsigned int initial_global_refinement = 4;
+  const unsigned int initial_global_refinement = 10;
 
   GridGenerator::hyper_L (triangulation);
   triangulation.refine_global (initial_global_refinement);
@@ -251,7 +256,6 @@ void HeatEquation<dim>::step(Vector<double>& braid_data,
                                       tmp);
 
   forcing_terms.add(deltaT * (1 - theta), tmp);
-
   system_rhs += forcing_terms;
 
   system_matrix.copy_from(mass_matrix);

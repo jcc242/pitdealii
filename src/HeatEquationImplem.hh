@@ -49,6 +49,7 @@ template <int dim>
 double BoundaryValues<dim>::value (const Point<dim> &p,
                             const unsigned int component) const
 {
+  UNUSED(p);
   (void) component;
   Assert (component == 0, ExcIndexRange(component, 0, 1));
   return 0;
@@ -110,6 +111,9 @@ void HeatEquation<dim>::initialize(double a_time,
   VectorTools::project (dof_handler, constraints,
                         QGauss<dim>(fe.degree+1), iv_function,
                         a_vector);
+#else
+  UNUSED(a_time);
+  UNUSED(a_vector);
 #endif // DO_MFG
   // If not the MFG solution case, a_vector is already zero'd so do nothing
 }
@@ -213,9 +217,6 @@ void HeatEquation<dim>::define()
 
   tmp.reinit (dof_handler.n_dofs());
   forcing_terms.reinit (dof_handler.n_dofs());
-
-  int time_step = 0;
-  double time = 0.;
 }
 
 template<int dim>

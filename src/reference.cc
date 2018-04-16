@@ -168,7 +168,7 @@ namespace Reference
     fe(1),
     dof_handler(triangulation),
     time (0.0),
-    time_step(1. / 50000),
+    time_step(1. / 5000),
     timestep_number (0),
     theta(0.5)
   {}
@@ -232,8 +232,8 @@ namespace Reference
 
     constraints.distribute(solution);
 
-    // std::cout << "     " << solver_control.last_step()
-    //           << " CG iterations." << std::endl;
+    std::cout << "     " << solver_control.last_step()
+              << " CG iterations." << std::endl;
   }
 
 
@@ -311,7 +311,7 @@ namespace Reference
   template <int dim>
   void HeatEquation<dim>::run()
   {
-    const unsigned int initial_global_refinement = 4;
+    const unsigned int initial_global_refinement = 10;
 
     GridGenerator::hyper_L (triangulation);
     triangulation.refine_global (initial_global_refinement);
@@ -332,7 +332,7 @@ namespace Reference
 
     // output_results();
 
-    while (time <= 0.5)
+    while (time <= 0.006 && timestep_number != 1)
       {
         time += time_step;
         ++timestep_number;
@@ -388,8 +388,8 @@ namespace Reference
 
         solve_time_step();
 
-        // if(timestep_number % 100 == 0)
-        //   output_results();
+        //  if(timestep_number % 100 == 0)
+        // output_results();
 
         old_solution = solution;
       }

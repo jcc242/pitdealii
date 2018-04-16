@@ -1,6 +1,18 @@
 #ifndef _BRAIDFUNCS_H_
 #define _BRAIDFUNCS_H_
 
+/**
+ *   \file BraidFuncs.cc
+ *   \brief Contains the implementation of the mandatory X-Braid functions
+ *
+ *  X-Braid mandates several functions in order to drive the solution.
+ *  This file contains the implementation of said mandatory functions.
+ *  See the X-Braid documentation for more information.
+ *  There are several functions that are optional in X-Braid that may
+ *  or may not be implemented in here.
+ *
+ */
+
 /*-------- System --------*/
 
 /*-------- Third Party --------*/
@@ -109,27 +121,96 @@ my_Sum(braid_App app,
        double beta,
        braid_Vector y);
 
+/**
+ *  \brief Returns the spatial norm of the provided vector
+ *
+ *  Calculates and returns the spatial norm of the provided vector.
+ *  Interestingly enough, X-Braid does not specify a particular norm.
+ *  to keep things simple, we implement the Euclidean norm.
+ *
+ *  \param app - The braid app struct containing user data
+ *  \param u - The vector we need to take the norm of
+ *  \param norm_ptr - Pointer to the norm that was calculated, need to modify this
+ *  \return Success (0) or failure (1)
+ */
 int
 my_SpatialNorm(braid_App     app,
                braid_Vector  u,
                double       *norm_ptr);
 
+/**
+ *  \brief Allows the user to output details
+ *
+ *  The Access function is called at various points to allow the user to output
+ *  information to the screen or to files.
+ *  The astatus parameter provides various information about the simulation,
+ *  see the XBraid documentation for details on what information you can get.
+ *  Example information is what the current timestep number and current time is.
+ *  If the access level (in pitdealii.cc) is set to 0, this function is never
+ *  called.
+ *  If the access level is set to 1, the function is called after the last
+ *  XBraid cycle.
+ *  If the access level is set to 2, it is called every XBraid cycle.
+ *
+ *  \param app - The braid app struct containing user data
+ *  \param u - The vector containing the data at the status provided
+ *  \param astatus - The Braid status structure
+ *  \return Success (0) or failure (1)
+ */
 int
 my_Access(braid_App          app,
           braid_Vector       u,
           braid_AccessStatus astatus);
 
+/**
+ *  \brief Calculates the size of a buffer for MPI data transfer
+ *
+ *  Calculates the size of the buffer that is needed to transfer
+ *  a solution vector to another processor.
+ *  The bstatus parameter provides various information on the
+ *  simulation, see the XBraid documentation for all possible
+ *  fields.
+ *
+ *  \param app - The braid app struct containing user data
+ *  \param size_ptr A pointer to the calculated size
+ *  \param bstatus The XBraid status structure
+ *  \return Success (0) or failure (1)
+ */
 int
 my_BufSize(braid_App           app,
            int                 *size_ptr,
            braid_BufferStatus  bstatus);
 
+/**
+ *  \brief Linearizes a vector to be sent to another processor
+ *
+ *  Linearizes (packs) a data buffer with the contents of
+ *  some solution state u.
+ *
+ *  \param app - The braid app struct containing user data
+ *  \param u The vector that must be packed into buffer
+ *  \param buffer The buffer that must be filled with u
+ *  \param bstatus The XBraid status structure
+ *  \return Success (0) or failure (1)
+ */
 int
 my_BufPack(braid_App           app,
            braid_Vector        u,
            void               *buffer,
            braid_BufferStatus  bstatus);
 
+/**
+ *  \brief Unpacks a vector that was sent from another processor
+ *
+ *  Unpacks a linear data buffer into the vector pointed to by
+ *  u_ptr.
+ *
+ *  \param app - The braid app struct containing user data
+ *  \param buffer The buffer that must be unpacked
+ *  \param u_ptr The pointer to the vector that is filled
+ *  \param bstatus The XBraid status structure
+ *  \return Success (0) or failure (1)
+ */
 int
 my_BufUnpack(braid_App           app,
              void               *buffer,

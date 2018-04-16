@@ -42,8 +42,8 @@ int main(int argc, char *argv[])
       /* Initialize Braid */
       braid_Core core;
       double tstart = 0.0;
-      double tstop = 0.5;
-      double ntime = 25000;
+      double tstop = 0.1;
+      double ntime = 2000;
       my_App *app = new(my_App);
 
 

@@ -40,9 +40,7 @@ double RightHandSideMFG<dim>::value (const Point<dim> &p,
 
   // return the manufactured solution of the right hand side
   double pi = numbers::PI;
-  return 4*pi*pi*std::exp(-4*pi*pi*time)
-    *std::cos(2*numbers::PI*p[0])
-    *std::cos(2*numbers::PI*p[1]);
+  return 4*pi*pi*std::exp(-4*pi*pi*time)*std::cos(2*pi*p[0])*std::cos(2*pi*p[1]);
 }
 
 template <int dim>
@@ -63,8 +61,9 @@ double ExactValuesMFG<dim>::value (const Point<dim> &p,
   Assert (component == 0, ExcIndexRange(component, 0, 1));
 
   double time = this->get_time();
+  const double pi = numbers::PI;
   // Return our manufactured solution boundary value
-  return std::exp(-4*numbers::PI*numbers::PI*time)*std::cos(2*numbers::PI*p[0])*std::cos(2*numbers::PI*p[1]);
+  return std::exp(-4*pi*pi*time)*std::cos(2*pi*p[0])*std::cos(2*pi*p[1]);
 }
 
 template <int dim>
@@ -74,8 +73,8 @@ Tensor<1,dim> ExactValuesMFG<dim>::gradient (const Point<dim>   &p,
   Tensor<1,dim> return_value;
   const double pi = numbers::PI;
   double time = this->get_time();
-  return_value[0] = -2*pi*std::exp(-4*pi*time)*std::cos(2*pi*p[1])*std::sin(2*pi*p[0]);
-  return_value[1] = -2*pi*std::exp(-4*pi*time)*std::cos(2*pi*p[0])*std::sin(2*pi*p[1]);
+  return_value[0] = -2*pi*std::exp(-4*pi*pi*time)*std::cos(2*pi*p[1])*std::sin(2*pi*p[0]);
+  return_value[1] = -2*pi*std::exp(-4*pi*pi*time)*std::cos(2*pi*p[0])*std::sin(2*pi*p[1]);
   return return_value;
 }
 
@@ -85,8 +84,9 @@ double InitialValuesMFG<dim>::value (const Point<dim> &p,
 {
   (void) component;
   Assert (component == 0, ExcIndexRange(component, 0, 1));
+  const double pi = numbers::PI;
   // Return our manufactured solution initial value
-  return std::cos(2*numbers::PI*p[0])*std::cos(2*numbers::PI*p[1]);
+  return std::cos(2*pi*p[0])*std::cos(2*pi*p[1]);
 }
 
 template <int dim>
@@ -203,7 +203,7 @@ void HeatEquation<dim>::output_results(int a_time_idx,
 template <int dim>
 void HeatEquation<dim>::define()
 {
-  const unsigned int initial_global_refinement = 4;
+  const unsigned int initial_global_refinement = 6;
 
   GridGenerator::hyper_L (triangulation);
   triangulation.refine_global (initial_global_refinement);
@@ -385,4 +385,6 @@ HeatEquation<dim>::process_solution(double a_time,
   std::cout << std::endl;
   convergence_table.write_text(std::cout);
 
+  std::ofstream error_table_file("tex-conv-table.tex");
+  convergence_table.write_tex(error_table_file);
 }

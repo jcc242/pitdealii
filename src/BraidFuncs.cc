@@ -105,26 +105,22 @@ my_Access(braid_App          app,
           braid_Vector       u,
           braid_AccessStatus astatus)
 {
-  UNUSED(app);
-  UNUSED(u);
-  UNUSED(astatus);
-  // int        index, rank, level, done;
-  // double     t;
-  // int index;
+  double     t;
+  int index;
 
-  // braid_AccessStatusGetT(astatus, &t);
-  // braid_AccessStatusGetTIndex(astatus, &index);
+  braid_AccessStatusGetT(astatus, &t);
+  braid_AccessStatusGetTIndex(astatus, &index);
 
-  // if(index % 100 == 0)
-  //   app->eq.output_results(index, t, u->data);
+  if(index % 100 == 0)
+    app->eq.output_results(index, t, u->data);
 
-// #if DO_MFG
-//   if(index == app->final_step)
-//     {
-//       pout() << "Doing error calc of step: " << index << std::endl;
-//       app->eq.process_solution(t, index, u->data);
-//     }
-// #endif
+#if DO_MFG
+  if(index == app->final_step)
+    {
+      pout() << "Doing error calc of step: " << index << std::endl;
+      app->eq.process_solution(t, index, u->data);
+    }
+#endif
 
   return 0;
 }

@@ -30,7 +30,9 @@ the field $u_h$ is specified as,
 which gives us the values of,
 \begin{align*}
   \frac{\partial u}{\partial t} &= -4 \pi^2 e^{-4\pi^2t}cos(2 \pi x)cos(2 \pi y), \\
-  -\Delta u &= 8 \pi^2 e^{-4\pi^2t}cos(2 \pi x)cos(2 \pi y)
+  -\Delta u &= 8 \pi^2 e^{-4\pi^2t}cos(2 \pi x)cos(2 \pi y) \\
+  \frac{\partial u}{\partial x} &= -2 \pi e^{-4\pi^2t}sin(2\pi x)cos(2\pi y) \\
+  \frac{\partial u}{\partial x} &= -2 \pi e^{-4\pi^2t}cos(2\pi x)sin(2\pi y)
 \end{align*}
 and therefore we specify the terms from the governing equations as,
 \begin{align*}
@@ -51,7 +53,7 @@ The $\Delta t$ is reduced by a factor of 2 for every global refinement of the me
 
 \begin{table}\label{tbl:errorMFG}
   \begin{center}
-    \begin{tabular}{|c|r|r|c|c|c|} \hline
+    \begin{tabular}{|c|c|c|c|c|c|} \hline
       cycle & \# cells & \# dofs & $L^2$-error & $H^1$-error & $L^\infty$-error \\ \hline
       125 & 48 & 65 & 6.036e-03 & 6.970e-02 & 7.557e-03\\ \hline
       250 & 192 & 225 & 1.735e-03 & 3.414e-02 & 2.721e-03 \\ \hline
@@ -67,11 +69,11 @@ The $\Delta t$ is reduced by a factor of 2 for every global refinement of the me
   \begin{center}
     \begin{tabular}{|c|c|c|c|c|c|} \hline
       cycle & \# cells & \# dofs & Slope $L^2$ & Slope $H^1$  & Slope $\textrm{L}^\infty$ \\ \hline
-      125 & 48 & 65 & & & \\ \hline
+      125 & 48 & 65 & --- & --- & --- \\ \hline
       250 & 192 & 225 & 1.798 & 1.030 & 1.474 \\ \hline
       500 & 768 & 833 & 1.943 & 1.014 & 1.877 \\ \hline
-      1000 & 3072 & 3201 & 1.985 & & 1.981 \\ \hline
-      2000 & 12288 & 12545 & 1.995 & & 1.993 \\ \hline
+      1000 & 3072 & 3201 & 1.985 & 1.004 & 1.981 \\ \hline
+      2000 & 12288 & 12545 & 1.995 & 1.001  & 1.993 \\ \hline
     \end{tabular}
   \end{center}
   \caption{Convergence rate of the error from Table~\ref{tbl:errorMFG}.}

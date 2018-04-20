@@ -133,13 +133,42 @@ public:
                         const unsigned int component = 0) const;
 };
 
+/**
+ * Provides the exact value for the manufactured solution.
+ * User must set the time using ExactValuesMFG::set_time(const Number new_time);
+ * Calculates \f$u_h=e^(-4\pi\pi t)*\cos(2\pi x)\cos(2\pi y)\f$ for all points given to it.
+ * In the context of manufactured solutions, this is used on the boundary.
+ */
 template <int dim>
 class ExactValuesMFG : public Function<dim>
 {
 public:
+  /**
+   *  \brief Computes the value at the given point and member data time
+   *
+   *  Computes the exact value of the manufactured solution at point p and
+   *  the member data time. See the class documentation and the design doc
+   *  for details on what the exact solution is.
+   *
+   *  \param p The point that the exact solution is computed at
+   *  \param component The component of the exact solution (always 0 for now)
+   *  \return double The exact value that was computed
+   */
   virtual double value (const Point<dim> &p,
                         const unsigned int component = 0) const;
 
+  /**
+   *  \brief Computes the gradient of the exact solution at the given point
+   *
+   *  Computes the gradient of the exact/manufactured solution value at
+   *  point p and member data time. See the design doc for details on
+   *  what the gradient of the exact solution is
+   *
+   *  \param p The point that the gradient is calculated at
+   *  \param component The component of the system of equations this gradient is for
+   *  \return Tensor<1,dim> A rank 1 tensor that contains the gradient
+   *  in each spatial dimension
+   */
   virtual Tensor<1,dim> gradient (const Point<dim>   &p,
                                   const unsigned int  component = 0) const;
 };

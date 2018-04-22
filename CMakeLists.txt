@@ -52,7 +52,7 @@ if(DO_MFG)
 endif(DO_MFG)
 
 FIND_PACKAGE(deal.II 9.0.0 QUIET
-  HINTS ${deal.II_DIR} ${DEAL_II_DIR} $ENV{HOME}/Sources/builddealii ../../../builddealii ../ ../../ $ENV{DEAL_II_DIR}
+  HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 IF(NOT ${deal.II_FOUND})
   MESSAGE(FATAL_ERROR "\n"
@@ -66,9 +66,11 @@ include_directories(${DEAL_II_INCLUDE_DIRS})
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 
 # Find braid details
-set(BRAID_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../braid")
+if (NOT "$ENV{BRAID_DIR}" STREQUAL "")
+    set(BRAID_DIR "$ENV{BRAID_DIR}" CACHE INTERNAL "Copied BRAID_DIR from environment variable")
+endif()
 # Include the braid paths and libraries
-include_directories(${BRAID_DIR}/)
+include_directories(${BRAID_DIR})
 
 
 ##############################
@@ -84,7 +86,7 @@ add_library(${LIB_NAME} ${SRC})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_PATH})
 add_executable(${MAIN_NAME} ${MAIN_SRC})
 target_link_libraries(${MAIN_NAME} ${LIB_NAME}) # link my library
-target_link_libraries(${MAIN_NAME} ${BRAID_DIR}/libbraid.a) # link braid
+target_link_libraries(${MAIN_NAME} ${BRAID_DIR}libbraid.a) # link braid
 DEAL_II_SETUP_TARGET(${MAIN_NAME}) # Link dealii
 if(USE_MPI)
 set_target_properties(${MAIN_NAME} PROPERTIES

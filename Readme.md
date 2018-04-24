@@ -38,7 +38,25 @@ In order to simplify the problem the adaptive mesh refinement is removed.
 Theoretically XBraid is capable of working with adaptive mesh refinement and in fact contains support for time refinement (which is also not used for simplicity).
 All adaptive mesh refinement functionality is removed from the sovler.
 The time-dependent solution state vectors are also removed from the <kbd>HeatEquation</kbd> member data.
-That data will be provided at each timestep by XBraid via the <kbd>vector</kbd> struct.
+That time-dependent data will be provided at each timestep by XBraid via the <kbd>vector</kbd> struct.
+
+### Code Organization
+
+#### The src directory
+
+The entry point of the code is in <kbd>pitdealii.cc</kbd> and sets up XBraid for a simulation. The XBraid setup involves initializing the <kbd>app</kbd> struct and configuring XBraid for the desired number of timesteps, number of iterations, etc.
+The functions implemented for XBraid's use are declared in <kbd>BraidFuncs.hh</kbd> and defined in <kbd>BraidFuncs.cc</kbd>. The <kbd>HeatEquation</kbd> class and all <kbd>deal.ii</kbd> functionality is declared in <kbd>HeatEquation.hh</kbd> and defiend in <kbd>HeatEquationImplem.hh</kbd>. Since <kbd>HeatEquation</kbd> is a class template, its definition file <kbd>HeatEquationImplem.hh</kbd> is included at the bottom of <kbd>HeatEquation.hh</kbd>. Lastly various helper functions and variables such as the current processor id and the output stream are declared in <kbd>Utilities.hh</kbd> and defined in <kbd>Utilities.cc</kbd>.
+
+#### The test directory
+
+This directory contains tests to be built and run with CMake.
+These tests verify the correct implementation of the various functions.
+
+#### The doc directory
+
+This directory contains some further documentation on the code.
+There is a doxygen config file in the <kbd>doxygen/doc/</kbd> folder, you can generate doxygen documentation with <kbd>doxygen pitdealii.doxygen</kbd>.
+In the design folder there is a latex file that has some further documentation on the algorithm implemented in this software.
 
 ## Compiling
 
@@ -63,9 +81,9 @@ There is currently no option to install pitdealii anywhere.
 The binaries are generated in the <kbd>bin</kbd> folder, and tests are placed into the <kbd>test</kbd> folder.
 Options that can be passed to CMake for pitdealii include:
 
-  * CMAKE_BUILD_TYPE=Debug/Release
-  * DO_MFG=ON/OFF
-  * USE_MPI=ON/OFF
+  * <kbd>CMAKE_BUILD_TYPE=Debug/Release</kbd>
+  * <kbd>DO_MFG=ON/OFF</kbd>
+  * <kbd>USE_MPI=ON/OFF</kbd>
 
 The build type specifies whether to compile with debugging symbols, assertions, and optimizations or not.
 

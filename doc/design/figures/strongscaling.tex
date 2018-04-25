@@ -1,0 +1,19 @@
+\documentclass{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\begin{tikzpicture}
+  \begin{axis}[
+    ymode=log,
+    xmode=log,
+    xlabel={Number Processors in Time},
+    ylabel={Wall Clock Time (seconds)},
+    ymin=0,ymax=10000,
+    xmin=0,xmax=1000,
+    width=10cm, height=10cm]
+    \addplot table [x index={0}, y index={1}, col sep=comma] {scaling.dat};
+    \draw ({rel axis cs:0,0}|-{axis cs:0,265.90}) -- ({rel axis cs:1,0}|-{axis cs:0,265.90});
+    \node[label={Serial},circle,fill,inner sep=2pt] at (axis cs:1,265.90) {};
+\end{axis}
+\end{tikzpicture}
+\end{document}

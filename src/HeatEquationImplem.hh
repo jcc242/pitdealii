@@ -123,14 +123,14 @@ void HeatEquation<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
-  // pout() << std::endl
-  //        << "==========================================="
-  //        << std::endl
-  //        << "Number of active cells: " << triangulation.n_active_cells()
-  //        << std::endl
-  //        << "Number of degrees of freedom: " << dof_handler.n_dofs()
-  //        << std::endl
-  //        << std::endl;
+  std::cout << std::endl
+         << "==========================================="
+         << std::endl
+         << "Number of active cells: " << triangulation.n_active_cells()
+         << std::endl
+         << "Number of degrees of freedom: " << dof_handler.n_dofs()
+         << std::endl
+         << std::endl;
 
   constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
@@ -208,7 +208,7 @@ void HeatEquation<dim>::output_results(int a_time_idx,
 template <int dim>
 void HeatEquation<dim>::define()
 {
-  const unsigned int initial_global_refinement = 6;
+  const unsigned int initial_global_refinement = 5;
 
   GridGenerator::hyper_L (triangulation);
   triangulation.refine_global (initial_global_refinement);

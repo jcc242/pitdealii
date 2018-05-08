@@ -1,0 +1,25 @@
+\documentclass{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\begin{tikzpicture}
+  \begin{axis}[
+    ymode=log,
+    xmode=log,
+    xlabel={Number Processors in Time},
+    ylabel={Wall Clock Time (seconds)},
+    ymin=1e2,ymax=2e4,
+    xmin=5e-1,xmax=2e2,
+    width=6cm, height=8cm]
+    
+    \addplot[mark=square*, black] table [x index={0}, y index={1}, col sep=comma] {figures/scaling2.dat};
+    \addlegendentry{Parallel};
+    
+    \draw ({rel axis cs:0,0}|-{axis cs:0,993.859406}) -- ({rel axis cs:1,0}|-{axis cs:0,993.859406});
+    % \node[label={Serial},circle,fill,inner sep=2pt] at (axis cs:1,993.859406) {};
+    \addplot[mark=*] coordinates {(1,993.859406)};
+    \addlegendentry{Serial};
+    
+  \end{axis}
+\end{tikzpicture}
+\end{document}

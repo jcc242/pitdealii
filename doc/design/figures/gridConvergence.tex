@@ -1,0 +1,90 @@
+\documentclass{standalone}
+
+\PassOptionsToPackage{rgb}{xcolor}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{calc}
+\usepackage[nomessages]{fp}
+
+% \usepackage{cfdpcommands}
+% \usepackage{cfdpboundingbox}
+% \usepackage{cfdpplotmarks}
+% \usepackage{cfdpdatapath}
+
+\usetikzlibrary{calc}
+
+\pgfplotsset{compat=1.5}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfplotsset {
+    scale only axis,
+    /tikz/errlines/.style={thick},
+    /tikz/errmarks/.style={thin,solid,color=black,fill=white,fill opacity=0.7}
+  }
+
+%--Error
+
+  \begin{loglogaxis}[
+    reverse legend,
+    xlabel=$\Delta x$,
+    ylabel=Solution Error,
+    width=5cm,
+    height=7cm,
+    domain=2^(-6):2^(-2),
+    ymin=1.0E-6,
+    ymax=1.0E0,
+    enlarge x limits=0.05,
+    log basis x=2,  % You normally want base 2 since we double the grid
+    % xticklabel=\pgfmathparse{2^\tick}\pgfmathprintnumber{\pgfmathresult}
+    legend pos = {south east}
+    ]
+
+    \def\intcl{0.05} %left x intercept of axis
+    \def\intcr{0.075} %right x intercept of axis
+
+    % Slope 1
+    \def\kb{1} %slope
+    \def\ab{0.8} %coeff
+    \addplot[very thick,color=black!50,forget plot] {(x*\ab)^\kb};
+
+    \FPeval{\ylb}{2^(\kb*ln(\intcr)/ln(2) + ln(\ab^(\kb))/ln(2) )}
+    \FPeval{\yrb}{2^(\kb*ln(\intcl)/ln(2) + ln(\ab^(\kb))/ln(2) )}
+    \draw
+    (axis cs:\intcl,\yrb)
+    |- (axis cs:\intcr,\ylb)
+    node[near start,left]
+    {$\frac{\displaystyle dy}{\displaystyle dx} = \kb$};
+
+    % Slope 2
+    \def\cb{2} %slope
+    \def\db{0.2} %coeff
+    \addplot[very thick,color=black!50,forget plot] {(x*\db)^\cb};
+
+    \FPeval{\ylt}{2^(\cb*ln(\intcr)/ln(2) + ln(\db^(\cb))/ln(2) )}
+    \FPeval{\yrt}{2^(\cb*ln(\intcl)/ln(2) + ln(\db^(\cb))/ln(2) )}
+    \draw
+    (axis cs:\intcr,\ylt)
+    |- (axis cs:\intcl,\yrt)
+    node[near start,right]
+    {$\frac{\displaystyle dy}{\displaystyle dx} = \cb$};
+
+    % L1
+    \addplot[errlines, dashed, mark=triangle*, mark options={solid}]
+    table[x={dx},y={L2-error}, col sep=comma] {figures/convergence.dat};
+    \addlegendentry{\makebox[0.2in]{$L^2$} Error};
+    
+    \addplot[errlines,solid, mark=*, mark options={solid}]
+    table[x={dx},y={H1-error}, col sep=comma] {figures/convergence.dat};
+    \addlegendentry{\makebox[0.2in]{$H^1$} Error};
+    
+    \addplot[errlines, dotted, mark=square*, mark options={solid}]
+    table[x={dx},y={Linfty-error}, col sep=comma] {figures/convergence.dat};
+    \addlegendentry{\makebox[0.2in]{$L^\infty$} Error};
+  \end{loglogaxis}
+%  \drawbb
+%  \printbbsize
+\end{tikzpicture}
+
+\end{document}
